@@ -34,7 +34,7 @@ const FOOD_CATEGORY = [
     1=>"Junior",
     2=>"Senior"
 ];
-const USER_GROUP_LIST = ['employee', 'manager'];
+const USER_GROUP_LIST = ['customer', 'seller'];
 const ADMIN_GROUP_LIST = ['superuser', 'admin', 'subadmin'];
 const DASHBOARD_GROUP_LIST = ['superuser', 'admin', 'subadmin','seller'];
 const PERMISSION_GROUP_LIST = ['all', 'employee', 'event', 'subadmin'];

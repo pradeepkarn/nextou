@@ -24,7 +24,7 @@ $req->ug = $ug;
                     <div class="row">
                         <div class="col-md-8">
                             <h4>Email</h4>
-                            <input type="email" value="<?php echo $ud->email; ?>" name="email" class="form-control my-3" placeholder="Eemail">
+                            <input <?php echo is_superuser()?null:"readonly"; ?> type="email" value="<?php echo $ud->email; ?>" name="email" class="form-control my-3" placeholder="Eemail">
                         </div>
                         <div class="col-md-4">
                             <h4>Username</h4>

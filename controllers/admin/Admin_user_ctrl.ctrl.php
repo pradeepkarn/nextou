@@ -4,6 +4,9 @@ class Admin_user_ctrl
     // Cretae page
     public function create($req = null)
     {
+        if (!is_superuser()) {
+            header("Location:" . BASEURI . "/admin");
+        }
         $req = obj($req);
         $context = (object) array(
             'page' => 'users/create.php',
@@ -17,6 +20,9 @@ class Admin_user_ctrl
     // List users
     public function list($req = null)
     {
+        if (!is_superuser()) {
+            header("Location:" . BASEURI . "/admin");
+        }
         $req = obj($req);
         $current_page = 0;
         $data_limit = DB_ROW_LIMIT;
@@ -71,6 +77,9 @@ class Admin_user_ctrl
     // Trashed user list
     public function trash_list($req = null)
     {
+        if (!is_superuser()) {
+            header("Location:" . BASEURI . "/admin");
+        }
         $req = obj($req);
 
         $current_page = 0;
@@ -110,6 +119,11 @@ class Admin_user_ctrl
     public function edit($req = null)
     {
         $req = obj($req);
+        if (!is_superuser()) {
+            if (USER['id'] != $req->id) {
+                header("Location:" . BASEURI . "/admin");
+            }
+        }
         $context = (object) array(
             'page' => 'users/edit.php',
             'data' => (object) array(
@@ -122,16 +136,21 @@ class Admin_user_ctrl
     // Save user by ajax call
     public function save($req = null)
     {
+        if (!is_superuser()) {
+            msg_set("Access denied");
+            echo js_alert(msg_ssn("msg", true));
+            exit;
+        }
         $req = obj($req);
         $request = null;
         $data = null;
         $data = $_POST;
 
 
-        $data['image'] = $_FILES['image']??null;
+        $data['image'] = $_FILES['image'] ?? null;
         // $data['vhcl_doc'] = $_FILES['vhcl_doc']??null;
         // $data['dl_doc'] = $_FILES['dl_doc']??null;
-        $data['nid_doc'] = $_FILES['nid_doc']??null;
+        $data['nid_doc'] = $_FILES['nid_doc'] ?? null;
 
         $rules = [
             'email' => 'required|email',
@@ -181,10 +200,10 @@ class Admin_user_ctrl
             $arr['last_name'] = sanitize_remove_tags($request->last_name);
             $arr['nid_no'] = sanitize_remove_tags($request->nid_no);
 
-            $arr['address'] = sanitize_remove_tags($request->address??null);
-            $arr['city'] = sanitize_remove_tags($request->city??null);
-            $arr['state'] = sanitize_remove_tags($request->state??null);
-            $arr['zipcode'] = sanitize_remove_tags($request->zipcode??null);
+            $arr['address'] = sanitize_remove_tags($request->address ?? null);
+            $arr['city'] = sanitize_remove_tags($request->city ?? null);
+            $arr['state'] = sanitize_remove_tags($request->state ?? null);
+            $arr['zipcode'] = sanitize_remove_tags($request->zipcode ?? null);
 
             if (isset($request->position)) {
                 $arr['position'] = $request->position;
@@ -193,7 +212,7 @@ class Admin_user_ctrl
                 $arr['mobile'] = intval($request->mobile);
             }
             if (isset($request->isd_code)) {
-                $arr['isd_code'] = intval(str_replace("+","",$request->isd_code));
+                $arr['isd_code'] = intval(str_replace("+", "", $request->isd_code));
             }
             if (isset($request->country)) {
                 $arr['country'] = $request->country;
@@ -219,7 +238,6 @@ class Admin_user_ctrl
                     if ($upload) {
                         $filearr['image'] = $imgname;
                     }
-                    
                 }
                 if (isset($request->nid_doc)) {
                     $ext = pathinfo($request->nid_doc['name'], PATHINFO_EXTENSION);
@@ -229,7 +247,6 @@ class Admin_user_ctrl
                     if ($upload) {
                         $filearr['nid_doc'] = $docname;
                     }
-                    
                 }
                 // if (isset($request->dl_doc)) {
                 //     $ext = pathinfo($request->dl_doc['name'], PATHINFO_EXTENSION);
@@ -239,7 +256,7 @@ class Admin_user_ctrl
                 //     if ($upload) {
                 //         $filearr['dl_doc'] = $imgname;
                 //     }
-                   
+
                 // }
                 // if (isset($request->vhcl_doc)) {
                 //     $ext = pathinfo($request->vhcl_doc['name'], PATHINFO_EXTENSION);
@@ -249,7 +266,7 @@ class Admin_user_ctrl
                 //     if ($upload) {
                 //         $filearr['vhcl_doc'] = $imgname;
                 //     }
-                    
+
                 // }
                 if (count($filearr)) {
                     (new Model('pk_user'))->update($postid, $filearr);
@@ -270,6 +287,13 @@ class Admin_user_ctrl
     public function update($req = null)
     {
         $req = obj($req);
+        if (!is_superuser()) {
+            if (USER['id'] != $req->id) {
+                msg_set("Access denied");
+                echo js_alert(msg_ssn("msg", true));
+                exit;
+            }
+        }
         $user_exists = (new Model('pk_user'))->exists(['id' => $req->id, 'user_group' => $req->ug]);
         if ($user_exists == false) {
             $_SESSION['msg'][] = "Object not found";
@@ -287,10 +311,10 @@ class Admin_user_ctrl
             $data['image'] = false;
         }
 
-        $data['image'] = $_FILES['image']??null;
+        $data['image'] = $_FILES['image'] ?? null;
         // $data['vhcl_doc'] = $_FILES['vhcl_doc']??null;
         // $data['dl_doc'] = $_FILES['dl_doc']??null;
-        $data['nid_doc'] = $_FILES['nid_doc']??null;
+        $data['nid_doc'] = $_FILES['nid_doc'] ?? null;
 
         $rules = [
             'email' => 'required|email',
@@ -334,13 +358,14 @@ class Admin_user_ctrl
             // if ($request?->role=='superuser') {
             //     $request->role=='admin';
             // }
-            if ($user->username != 'admin') {
-                $arr['username'] = generate_clean_username($request->username);
-                // $arr['role'] = sanitize_remove_tags($request->role);
-                $arr['user_group'] = $req->ug;
+            
+            if (is_superuser()) {
+                if ($user->username != 'admin') {
+                    $arr['username'] = generate_clean_username($request->username);
+                    $arr['user_group'] = $req->ug;
+                }
+                $arr['email'] = $request->email;
             }
-            $arr['email'] = $request->email;
-
             $arr['first_name'] = sanitize_remove_tags($request->first_name);
             $arr['last_name'] = sanitize_remove_tags($request->last_name);
             if (isset($request->position)) {
@@ -350,7 +375,7 @@ class Admin_user_ctrl
                 $arr['mobile'] = intval($request->mobile);
             }
             if (isset($request->isd_code)) {
-                $arr['isd_code'] = intval(str_replace("+","",$request->isd_code));
+                $arr['isd_code'] = intval(str_replace("+", "", $request->isd_code));
             }
             if (isset($request->country)) {
                 $arr['country'] = $request->country;
@@ -361,11 +386,11 @@ class Admin_user_ctrl
             if (isset($request->ac_type)) {
                 $arr['ac_type'] = intval($request->ac_type);
             }
-            
+
             // if (isset($request->food_category)) {
             //     $arr['food_category'] = intval($request->food_category);
             // }
-           
+
             if (isset($request->password) && $request->password != "") {
                 $arr['password'] = md5($request->password);
                 $_SESSION['msg'][] = "Password updated";
@@ -375,15 +400,15 @@ class Admin_user_ctrl
             }
             $arr['updated_at'] = date('Y-m-d H:i:s');
 
-            $arr['nid_no'] = sanitize_remove_tags($request->nid_no??null);
-            $arr['dl_no'] = sanitize_remove_tags($request->dl_no??null);
-            $arr['vhcl_no'] = sanitize_remove_tags($request->vhcl_no??null);
+            $arr['nid_no'] = sanitize_remove_tags($request->nid_no ?? null);
+            $arr['dl_no'] = sanitize_remove_tags($request->dl_no ?? null);
+            $arr['vhcl_no'] = sanitize_remove_tags($request->vhcl_no ?? null);
 
-            $arr['address'] = sanitize_remove_tags($request->address??null);
-           
-            $arr['city'] = sanitize_remove_tags($request->city??null);
-            $arr['state'] = sanitize_remove_tags($request->state??null);
-            $arr['zipcode'] = sanitize_remove_tags($request->zipcode??null);
+            $arr['address'] = sanitize_remove_tags($request->address ?? null);
+
+            $arr['city'] = sanitize_remove_tags($request->city ?? null);
+            $arr['state'] = sanitize_remove_tags($request->state ?? null);
+            $arr['zipcode'] = sanitize_remove_tags($request->zipcode ?? null);
 
             $old = obj($user);
             if (isset($request->image) && $request->image['name'] != "" && $request->image['error'] == 0) {
@@ -404,7 +429,6 @@ class Admin_user_ctrl
                     }
                     $filearr['image'] = $imgname;
                 }
-                
             }
             if (isset($request->nid_doc) && $request->nid_doc['name'] != "" && $request->nid_doc['error'] == 0) {
                 $ext = pathinfo($request->nid_doc['name'], PATHINFO_EXTENSION);
@@ -424,7 +448,6 @@ class Admin_user_ctrl
                     }
                     $filearr['nid_doc'] = $docname;
                 }
-                
             }
             if (isset($request->dl_doc) && $request->dl_doc['name'] != "" && $request->dl_doc['error'] == 0) {
                 $ext = pathinfo($request->dl_doc['name'], PATHINFO_EXTENSION);
@@ -444,7 +467,6 @@ class Admin_user_ctrl
                     }
                     $filearr['dl_doc'] = $docname;
                 }
-                
             }
             if (isset($request->vhcl_doc) && $request->vhcl_doc['name'] != "" && $request->vhcl_doc['error'] == 0) {
                 $ext = pathinfo($request->vhcl_doc['name'], PATHINFO_EXTENSION);
@@ -464,11 +486,10 @@ class Admin_user_ctrl
                     }
                     $filearr['vhcl_doc'] = $docname;
                 }
-                
             }
 
 
-           
+
             try {
                 (new Model('pk_user'))->update($request->id, $arr);
                 $_SESSION['msg'][] = "Updated";
