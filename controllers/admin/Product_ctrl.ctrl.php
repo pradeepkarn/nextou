@@ -27,7 +27,7 @@ class Product_ctrl
             $current_page = (abs($req->page) - 1) * $data_limit;
             $page_limit = "$current_page,$data_limit";
         }
-        $total_page = $this->product_list(ord: "DESC", limit: 10000, active: 1,created_by:USER['id']);
+        $total_page = $this->product_list(ord: "DESC", limit: 10000, active: 1, created_by: USER['id']);
         $tp = count($total_page);
         if ($tp %  $data_limit == 0) {
             $tp = $tp / $data_limit;
@@ -35,9 +35,9 @@ class Product_ctrl
             $tp = floor($tp / $data_limit) + 1;
         }
         if (isset($req->search)) {
-            $product_list = $this->product_search_list($keyword = $req->search, $ord = "DESC", $limit = $page_limit, $active = 1,created_by:USER['id']);
+            $product_list = $this->product_search_list($keyword = $req->search, $ord = "DESC", $limit = $page_limit, $active = 1, created_by: USER['id']);
         } else {
-            $product_list = $this->product_list(ord: "DESC", limit: $page_limit, active: 1,created_by:USER['id']);
+            $product_list = $this->product_list(ord: "DESC", limit: $page_limit, active: 1, created_by: USER['id']);
         }
         $context = (object) array(
             'page' => 'products/list.php',
@@ -73,9 +73,9 @@ class Product_ctrl
             $tp = floor($tp / $data_limit) + 1;
         }
         if (isset($req->search)) {
-            $product_list = $this->product_search_list($keyword = $req->search, $ord = "DESC", $limit = $page_limit, $active = 0,created_by:USER['id']);
+            $product_list = $this->product_search_list($keyword = $req->search, $ord = "DESC", $limit = $page_limit, $active = 0, created_by: USER['id']);
         } else {
-            $product_list = $this->product_list(ord: "DESC", limit: $page_limit, active: 0,created_by:USER['id']);
+            $product_list = $this->product_list(ord: "DESC", limit: $page_limit, active: 0, created_by: USER['id']);
         }
         $context = (object) array(
             'page' => 'products/list.php',
@@ -406,16 +406,32 @@ class Product_ctrl
         import("apps/admin/layouts/admin-main.php", $context);
     }
     // Post list
-    public function product_list($ord = "DESC", $limit = 5, $active = 1, $sort_by = 'id',$created_by=null)
+    public function product_list($ord = "DESC", $limit = 5, $active = 1, $sort_by = 'id', $created_by = null)
     {
+        if (is_superuser()) {
+            $cntobj = new Model('content');
+            return $cntobj->filter_index(array('content_group' => 'product', 'is_active' => $active), $ord, $limit, $change_order_by_col = $sort_by);
+        }
         if (!$created_by) {
             return [];
         }
         $cntobj = new Model('content');
-        return $cntobj->filter_index(array('content_group' => 'product', 'is_active' => $active,'created_by'=>$created_by), $ord, $limit, $change_order_by_col = $sort_by);
+        return $cntobj->filter_index(array('content_group' => 'product', 'is_active' => $active, 'created_by' => $created_by), $ord, $limit, $change_order_by_col = $sort_by);
     }
-    public function product_search_list($keyword, $ord = "DESC", $limit = 5, $active = 1,$created_by=null)
+    public function product_search_list($keyword, $ord = "DESC", $limit = 5, $active = 1, $created_by = null)
     {
+        if (is_superuser()) {
+            $cntobj = new Model('content');
+            $search_arr['id'] = $keyword;
+            $search_arr['title'] = $keyword;
+            $search_arr['author'] = $keyword;
+            return $cntobj->search(
+                assoc_arr: $search_arr,
+                ord: $ord,
+                limit: $limit,
+                whr_arr: array('content_group' => 'product', 'is_active' => $active)
+            );
+        }
         if (!$created_by) {
             return [];
         }
@@ -430,7 +446,7 @@ class Product_ctrl
             assoc_arr: $search_arr,
             ord: $ord,
             limit: $limit,
-            whr_arr: array('content_group' => 'product', 'is_active' => $active,'created_by'=>$created_by)
+            whr_arr: array('content_group' => 'product', 'is_active' => $active, 'created_by' => $created_by)
         );
     }
     public function product_detail($id)
