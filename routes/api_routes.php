@@ -20,6 +20,6 @@ $api_routes = [
     "/api/v1/product/details/{id}" =>'Product_api@details@name.producDetailsAPi',
 
     "/api/v1/product/create" =>'Product_api@create@name.productCreateApi',
-    "/api/v1/product/update" =>'Product_api@create@name.productUpdateApi',
+    "/api/v1/product/update" =>'Product_api@update@name.productUpdateApi',
     "/api/v1/product/create-review" =>'Review_api@create@name.reviewCreateApi',
 ];
