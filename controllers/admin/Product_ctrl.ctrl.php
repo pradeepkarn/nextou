@@ -225,6 +225,7 @@ class Product_ctrl
         $rules = [
             'id' => 'required|integer',
             'title' => 'required|string',
+            'price' => 'required|numeric',
             'content' => 'required|string',
             'parent_id' => 'required|integer'
         ];
@@ -246,6 +247,7 @@ class Product_ctrl
             $arr['json_obj'] = json_encode($json_arr);
             $arr['content_group'] = "product";
             $arr['title'] = $request->title;
+            $arr['price'] = $request->price;
             if ($content->slug != $request->slug) {
                 $arr['slug'] = generate_slug(trim($request->slug));
             }
