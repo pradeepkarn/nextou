@@ -88,7 +88,7 @@ class Product_api
         $request = null;
         $data = null;
         $data = $_POST;
-        $data['banner'] = $_FILES['banner'];
+        $data['banner'] = $_FILES['banner']??null;
         $rules = [
             'token' => 'required|string',
             'title' => 'required|string',
@@ -182,6 +182,7 @@ class Product_api
     }
     public function update($req = null)
     {
+        header('Content-Type: application/json');
         $req = obj($req);
         $content = obj(getData(table: 'content', id: $req->id));
         if ($content == false) {
@@ -193,7 +194,7 @@ class Product_api
         $data = null;
         $data = $_POST;
         $data['id'] = $req->id;
-        $data['banner'] = $_FILES['banner'];
+        $data['banner'] = $_FILES['banner']??null;
         $rules = [
             'token' => 'required|string',
             'id' => 'required|integer',
