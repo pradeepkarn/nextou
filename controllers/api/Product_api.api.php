@@ -183,12 +183,9 @@ class Product_api
     public function update($req = null)
     {
         header('Content-Type: application/json');
-        $req = obj($req);
-        
         $request = null;
         $data = null;
         $data = $_POST;
-        $data['id'] = $req->id;
         $data['banner'] = $_FILES['banner']??null;
         $rules = [
             'token' => 'required|string',
