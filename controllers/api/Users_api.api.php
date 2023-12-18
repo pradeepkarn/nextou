@@ -80,11 +80,18 @@ class Users_api
                 echo json_encode($api);
                 exit;
             }
+            $create_token = false;
             $after_second = 10 * 60;
+            if ($user['app_login_token']=='') {
+                $create_token = true;
+            }
             $app_login_time = strtotime($user['app_login_time'] ?? date('Y-m-d H:i:s'));
             $time_out = $after_second + $app_login_time;
             $current_time = strtotime(date('Y-m-d H:i:s'));
             if ($current_time > $time_out) {
+                $create_token = true;
+            }
+            if ($create_token) {
                 $token = uniqid() . bin2hex(random_bytes(8)) . "u" . $user['id'];
                 $datetime = date('Y-m-d H:i:s');
                 $this->db->tableName = 'pk_user';
@@ -285,7 +292,7 @@ class Users_api
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
             exit;
-        }else{
+        } else {
             msg_set("User not found, invalid token");
             $api['success'] = true;
             $api['data'] = $user;
@@ -343,12 +350,12 @@ class Users_api
         }
 
         $request = obj($data);
-        $request->username = $request->username??uniqid();
+        $request->username = $request->username ?? uniqid();
         $this->db = $this->db;
         $pdo = $this->db->conn;
         $pdo->beginTransaction();
         $this->db->tableName = 'pk_user';
-        $username = generate_clean_username($request->username );
+        $username = generate_clean_username($request->username);
         $username_exists = $this->db->get(['username' => $username]);
         $email_exists = $this->db->get(['email' => $request->email]);
         if ($username_exists) {
@@ -373,11 +380,10 @@ class Users_api
             $arr['username'] = $username;
             $arr['first_name'] = $request->first_name;
             $arr['last_name'] = $request->last_name ?? null;
-            $arr['isd_code'] = intval($request?->isd_code) ?? null;
-            $arr['mobile'] = intval($request?->mobile) ?? null;
+            $arr['isd_code'] = intval($request->isd_code ?? 0) ?? null;
+            $arr['mobile'] = intval($request->mobile ?? 0) ?? null;
             $arr['password'] = md5($request->password);
             $arr['nid_no'] = sanitize_remove_tags($request->nid_no ?? null);
-           
             if (isset($request->bio)) {
                 $arr['bio'] = $request->bio;
             }
@@ -466,11 +472,11 @@ class Users_api
         }
     }
 
-   
+
     function get_user_by_id($id = null)
     {
         if ($id) {
-            $u = $this->db->showOne("select * from pk_user where id = $id");
+            $u = $this->db->showOne("select * from pk_user where id = '$id'");
             if ($u) {
                 $u = obj($u);
                 return array(
@@ -493,7 +499,7 @@ class Users_api
     function get_user_by_token($token = null)
     {
         if ($token) {
-            $u = $this->db->showOne("select * from pk_user where app_login_token = '$token'");
+            $u = $this->db->showOne("select * from pk_user where app_login_token = '$token' and app_login_token!='';");
             if ($u) {
                 $u = obj($u);
                 return array(
