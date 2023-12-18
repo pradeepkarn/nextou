@@ -274,9 +274,6 @@ class Product_ctrl
                 $arr['imgs'] = json_encode($newimgs);
             }
 
-
-
-
             if ($request->banner['name'] != "" && $request->banner['error'] == 0) {
                 $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
                 $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;

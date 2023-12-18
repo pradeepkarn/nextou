@@ -90,11 +90,12 @@ class Product_api
         $data = $_POST;
         $data['banner'] = $_FILES['banner'];
         $rules = [
-            'token'=>'required|string',
+            'token' => 'required|string',
             'title' => 'required|string',
+            'price' => 'required|numeric',
             'content' => 'required|string',
             'banner' => 'required|file',
-            'category_id' => 'required|integer'
+            'category_id' => 'required|numeric'
         ];
         $pass = validateData(data: $data, rules: $rules);
         if (!$pass) {
@@ -128,6 +129,7 @@ class Product_api
             $arr['json_obj'] = json_encode($json_arr);
             $arr['content_group'] = "product";
             $arr['title'] = $request->title;
+            $arr['price'] = $request->price;
             $arr['slug'] = getUrlSafeString(generate_slug(trim($request->title)));
             $arr['content'] = $request->content;
             $arr['parent_id'] = $request->category_id;
@@ -178,50 +180,130 @@ class Product_api
             }
         }
     }
-    // function create($req = null){
-    //     header('Content-Type: application/json');
-    //     $rules = [
-    //         'category_id' => 'required|numeric',
-    //         'title' => 'required|string',
-    //         'content' => 'required|string',
-    //         'banner' => 'required|file'
-    //     ];
-    //     $pass = validateData(data: $req, rules: $rules);
-    //     if (!$pass) {
-    //         $api['success'] = false;
-    //         $api['data'] = null;
-    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-    //         echo json_encode($api);
-    //         exit;
-    //     }
-    //     $req = obj($req);
+    public function update($req = null)
+    {
+        $req = obj($req);
+        $content = obj(getData(table: 'content', id: $req->id));
+        if ($content == false) {
+            $_SESSION['msg'][] = "Object not found";
+            echo js_alert(msg_ssn("msg", true));
+            exit;
+        }
+        $request = null;
+        $data = null;
+        $data = $_POST;
+        $data['id'] = $req->id;
+        $data['banner'] = $_FILES['banner'];
+        $rules = [
+            'token' => 'required|string',
+            'id' => 'required|integer',
+            'title' => 'required|string',
+            'price' => 'required|numeric',
+            'content' => 'required|string',
+            'category_id' => 'required|numeric'
+        ];
+        $pass = validateData(data: $data, rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $request = obj($data);
+        $json_arr = array();
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($request->token);
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        if (isset($request->meta_tags)) {
+            $json_arr['meta']['tags'] = $request->meta_tags;
+        }
+        if (isset($request->meta_description)) {
+            $json_arr['meta']['description'] = $request->meta_description;
+        }
+        if (isset($request->title)) {
+            $arr = null;
+            $arr['json_obj'] = json_encode($json_arr);
+            $arr['content_group'] = "product";
+            $arr['title'] = $request->title;
+            $arr['price'] = $request->price;
+            if ($content->slug != $request->slug) {
+                $arr['slug'] = generate_slug(trim($request->slug));
+            }
+            $arr['content'] = $request->content;
+            $arr['parent_id'] = $request->category_id;
+            $arr['updated_at'] = date('Y-m-d H:i:s');
 
-    //     $arr['parent_id'] = $req->category_id; 
-    //     $arr['title'] = $req->title; 
-    //     $arr['slug'] = getUrlSafeString(generate_slug($req->title??uniqid("product"))); 
-    //     $arr['content'] = $req->content; 
+            // update more images
+            $imsgjsn = json_decode($content->imgs ?? '[]', true);
+            $moreimg = [];
+            if (isset($_FILES['moreimgs'])) {
+                $fl = $_FILES['moreimgs'];
+                for ($i = 0; $i < count($fl['name']); $i++) {
+                    if ($fl['name'][$i] != '' && $fl['error'][$i] === UPLOAD_ERR_OK) {
+                        $ext = pathinfo($fl['name'][$i], PATHINFO_EXTENSION);
+                        $imgstr = getUrlSafeString($fl['name'][$i]);
+                        $moreimgname = str_replace(" ", "_", $imgstr) . uniqid("_moreimg_") . "." . $ext;
+                        $dir = MEDIA_ROOT . "images/pages/" . $moreimgname;
+                        $upload = move_uploaded_file($fl['tmp_name'][$i], $dir);
+                        if ($upload) {
+                            $moreimg[] = $moreimgname;
+                        }
+                    }
+                }
+                $newimgs = array_merge($imsgjsn, $moreimg);
+                $arr['imgs'] = json_encode($newimgs);
+            }
 
-
-
-
-
-    //     $products = $this->product_details($req->id);
-    //     if ($products) {
-    //         msg_set('Products fetched successfully');
-    //         $api['success'] = true;
-    //         $api['data'] = $products;
-    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-    //         echo json_encode($api);
-    //         exit;
-    //     } else {
-    //         msg_set('Product not found');
-    //         $api['success'] = false;
-    //         $api['data'] =  null;
-    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-    //         echo json_encode($api);
-    //         exit;
-    //     }
-    // }
+            if ($request->banner['name'] != "" && $request->banner['error'] == 0) {
+                $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
+                $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
+                $dir = MEDIA_ROOT . "images/pages/" . $imgname;
+                $upload = move_uploaded_file($request->banner['tmp_name'], $dir);
+                if ($upload) {
+                    $arr['banner'] = $imgname;
+                    $old = obj($content);
+                    if ($old) {
+                        if ($old->banner != "") {
+                            $olddir = MEDIA_ROOT . "images/pages/" . $old->banner;
+                            if (file_exists($olddir)) {
+                                unlink($olddir);
+                            }
+                        }
+                    }
+                }
+            }
+            try {
+                (new Model('content'))->update($request->id, $arr);
+                msg_set('Product updated');
+                $api['success'] = true;
+                $api['data'] =  [];
+                $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+                echo json_encode($api);
+                exit;
+            } catch (PDOException $e) {
+                msg_set('Product not updated, check if any missing data');
+                $api['success'] = false;
+                $api['data'] =  null;
+                $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+                echo json_encode($api);
+                exit;
+            }
+        }
+        msg_set('Product not updated, title must not be empty');
+        $api['success'] = false;
+        $api['data'] =  null;
+        $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+        echo json_encode($api);
+        exit;
+    }
     function get_all_products()
     {
         $this->db->tableName = 'content';
