@@ -184,12 +184,7 @@ class Product_api
     {
         header('Content-Type: application/json');
         $req = obj($req);
-        $content = obj(getData(table: 'content', id: $req->id));
-        if ($content == false) {
-            $_SESSION['msg'][] = "Object not found";
-            echo js_alert(msg_ssn("msg", true));
-            exit;
-        }
+        
         $request = null;
         $data = null;
         $data = $_POST;
@@ -212,6 +207,16 @@ class Product_api
             exit;
         }
         $request = obj($data);
+        $content = obj(getData(table: 'content', id: $request->id));
+        if ($content == false) {
+            $_SESSION['msg'][] = "Object not found";
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+
         $json_arr = array();
         $userCtrl = new Users_api;
         $user = $userCtrl->get_user_by_token($request->token);
