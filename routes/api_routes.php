@@ -15,7 +15,7 @@ $api_routes = [
 
     ####################################################################################################
 
-    "/api/v1/product/category-list" =>'Product_api@list_categories@name.productCatListAPi',
+    "/api/v1/product/list-categories" =>'Product_api@list_categories@name.productCatListAPi',
     "/api/v1/product/list" =>'Product_api@list@name.productListAPi',
     "/api/v1/product/details/{id}" =>'Product_api@details@name.producDetailsAPi',
 
