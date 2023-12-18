@@ -81,40 +81,147 @@ class Product_api
             exit;
         }
     }
-    function create($req = null){
+    // Save by ajax call
+    public function create($req = null)
+    {
         header('Content-Type: application/json');
+        $request = null;
+        $data = null;
+        $data = $_POST;
+        $data['banner'] = $_FILES['banner'];
         $rules = [
-            'category_id' => 'required|numeric',
+            'token'=>'required|string',
             'title' => 'required|string',
             'content' => 'required|string',
-            'banner' => 'required|file'
+            'banner' => 'required|file',
+            'category_id' => 'required|integer'
         ];
-        $pass = validateData(data: $req, rules: $rules);
+        $pass = validateData(data: $data, rules: $rules);
         if (!$pass) {
-            $api['success'] = false;
-            $api['data'] = null;
-            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-            echo json_encode($api);
-            exit;
-        }
-        $req = obj($req);
-        $products = $this->product_details($req->id);
-        if ($products) {
-            msg_set('Products fetched successfully');
-            $api['success'] = true;
-            $api['data'] = $products;
-            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-            echo json_encode($api);
-            exit;
-        } else {
-            msg_set('Product not found');
             $api['success'] = false;
             $api['data'] =  null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
             exit;
         }
+        $request = obj($data);
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($request->token);
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $user = obj($user);
+        $json_arr = array();
+        if (isset($request->meta_tags)) {
+            $json_arr['meta']['tags'] = $request->meta_tags;
+        }
+        if (isset($request->meta_description)) {
+            $json_arr['meta']['description'] = $request->meta_description;
+        }
+        if (isset($request->title)) {
+            $arr = null;
+            $arr['json_obj'] = json_encode($json_arr);
+            $arr['content_group'] = "product";
+            $arr['title'] = $request->title;
+            $arr['slug'] = getUrlSafeString(generate_slug(trim($request->title)));
+            $arr['content'] = $request->content;
+            $arr['parent_id'] = $request->category_id;
+            $arr['created_at'] = date('Y-m-d H:i:s');
+            $arr['created_by'] = $user->id;
+
+            // more images
+            $moreimg = [];
+            if (isset($_FILES['moreimgs'])) {
+                $fl = $_FILES['moreimgs'];
+                for ($i = 0; $i < count($fl['name']); $i++) {
+                    if ($fl['name'][$i] != '' && $fl['error'][$i] === UPLOAD_ERR_OK) {
+                        $ext = pathinfo($fl['name'][$i], PATHINFO_EXTENSION);
+                        $imgstr = getUrlSafeString($fl['name'][$i]);
+                        $moreimgname = str_replace(" ", "_", $imgstr) . uniqid("_moreimg_") . "." . $ext;
+                        $dir = MEDIA_ROOT . "images/pages/" . $moreimgname;
+                        $upload = move_uploaded_file($fl['tmp_name'][$i], $dir);
+                        if ($upload) {
+                            $moreimg[] = $moreimgname;
+                        }
+                    }
+                }
+                $arr['imgs'] = json_encode($moreimg);
+            }
+
+            $postid = (new Model('content'))->store($arr);
+            if (intval($postid)) {
+                $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
+                $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
+                $dir = MEDIA_ROOT . "images/pages/" . $imgname;
+                $upload = move_uploaded_file($request->banner['tmp_name'], $dir);
+                if ($upload) {
+                    (new Model('content'))->update($postid, array('banner' => $imgname));
+                }
+                msg_set('Product created');
+                $api['success'] = false;
+                $api['data'] =  null;
+                $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+                echo json_encode($api);
+                exit;
+            } else {
+                msg_set('Product not created');
+                $api['success'] = false;
+                $api['data'] =  null;
+                $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+                echo json_encode($api);
+                exit;
+            }
+        }
     }
+    // function create($req = null){
+    //     header('Content-Type: application/json');
+    //     $rules = [
+    //         'category_id' => 'required|numeric',
+    //         'title' => 'required|string',
+    //         'content' => 'required|string',
+    //         'banner' => 'required|file'
+    //     ];
+    //     $pass = validateData(data: $req, rules: $rules);
+    //     if (!$pass) {
+    //         $api['success'] = false;
+    //         $api['data'] = null;
+    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+    //         echo json_encode($api);
+    //         exit;
+    //     }
+    //     $req = obj($req);
+
+    //     $arr['parent_id'] = $req->category_id; 
+    //     $arr['title'] = $req->title; 
+    //     $arr['slug'] = getUrlSafeString(generate_slug($req->title??uniqid("product"))); 
+    //     $arr['content'] = $req->content; 
+
+
+
+
+
+    //     $products = $this->product_details($req->id);
+    //     if ($products) {
+    //         msg_set('Products fetched successfully');
+    //         $api['success'] = true;
+    //         $api['data'] = $products;
+    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+    //         echo json_encode($api);
+    //         exit;
+    //     } else {
+    //         msg_set('Product not found');
+    //         $api['success'] = false;
+    //         $api['data'] =  null;
+    //         $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+    //         echo json_encode($api);
+    //         exit;
+    //     }
+    // }
     function get_all_products()
     {
         $this->db->tableName = 'content';
@@ -168,5 +275,50 @@ class Product_api
             'images' => $images,
             'seller' => $seller
         );
+    }
+    function upload_files($postid, $request, $user = null)
+    {
+        if (intval($postid)) {
+            $old = $user ? obj($user) : null;
+            if (isset($request->image) && $request->image['banner'] != "" && $request->image['error'] == 0) {
+                $ext = pathinfo($request->image['name'], PATHINFO_EXTENSION);
+                $imgname = str_replace(" ", "_", getUrlSafeString($request->username)) . uniqid("_") . "." . $ext;
+                $dir = MEDIA_ROOT . "images/profiles/" . $imgname;
+                $upload = move_uploaded_file($request->image['tmp_name'], $dir);
+                if ($upload) {
+                    $arr['image'] = $imgname;
+                    if ($old) {
+                        if ($old->image != "") {
+                            $olddir = MEDIA_ROOT . "images/profiles/" . $old->image;
+                            if (file_exists($olddir)) {
+                                unlink($olddir);
+                            }
+                        }
+                    }
+                    $filearr['image'] = $imgname;
+                }
+            }
+            if (isset($request->nid_doc) && $request->nid_doc['name'] != "" && $request->nid_doc['error'] == 0) {
+                $ext = pathinfo($request->nid_doc['name'], PATHINFO_EXTENSION);
+                $docname = str_replace(" ", "_", getUrlSafeString($request->username)) . uniqid("_") . "." . $ext;
+                $dir = MEDIA_ROOT . "docs/" . $docname;
+                $upload = move_uploaded_file($request->nid_doc['tmp_name'], $dir);
+                if ($upload) {
+                    $arr['nid_doc'] = $docname;
+                    if ($old) {
+                        if ($old->image != "") {
+                            $olddir = MEDIA_ROOT . "docs/" . $old->nid_doc;
+                            if (file_exists($olddir)) {
+                                unlink($olddir);
+                            }
+                        }
+                    }
+                    $filearr['nid_doc'] = $docname;
+                }
+            }
+            return $filearr;
+        } else {
+            return false;
+        }
     }
 }
