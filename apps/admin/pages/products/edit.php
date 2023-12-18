@@ -58,6 +58,8 @@ if ($pd->json_obj != "") {
                     <div id="image-container"></div>
                     <button type="button" class="btn btn-secondary text-white mt-2" id="add-image">Images <i class="bi bi-plus"></i> </button>
                     <hr>
+                    <h4>Price</h4>
+                    <input type="number" class="form-control" name="price" value="<?php echo $pd->price; ?>">
                     <?php
                     $imgs = get_image_list($pd->imgs);
                     $moreimgcount = count($imgs);
