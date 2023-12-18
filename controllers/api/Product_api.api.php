@@ -163,8 +163,8 @@ class Product_api
                     (new Model('content'))->update($postid, array('banner' => $imgname));
                 }
                 msg_set('Product created');
-                $api['success'] = false;
-                $api['data'] =  null;
+                $api['success'] = true;
+                $api['data'] =  [];
                 $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
                 echo json_encode($api);
                 exit;
