@@ -28,11 +28,66 @@ class Product_api
             exit;
         }
     }
+    function list_categories($req = null)
+    {
+        $req = obj($req);
+        header('Content-Type: application/json');
+        $products = $this->get_all_categories();
+        if ($products) {
+            msg_set('Categories fetched successfully');
+            $api['success'] = true;
+            $api['data'] = $products;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('Category not found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
     function details($req = null)
     {
         header('Content-Type: application/json');
         $rules = [
             'id' => 'required|string'
+        ];
+        $pass = validateData(data: $req, rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $req = obj($req);
+        $products = $this->product_details($req->id);
+        if ($products) {
+            msg_set('Products fetched successfully');
+            $api['success'] = true;
+            $api['data'] = $products;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('Product not found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
+    function create($req = null){
+        header('Content-Type: application/json');
+        $rules = [
+            'category_id' => 'required|numeric',
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'banner' => 'required|file'
         ];
         $pass = validateData(data: $req, rules: $rules);
         if (!$pass) {
@@ -74,6 +129,14 @@ class Product_api
             }
         }
         return  $products;
+    }
+    function get_all_categories()
+    {
+        $cats = $this->db->show("select id, title from content where content_group='product_category' and is_active=1;");
+        if ($cats) {
+            return $cats;
+        }
+        return  null;
     }
 
     function product_details($id)
