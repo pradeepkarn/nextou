@@ -88,7 +88,7 @@ class Product_api
         $request = null;
         $data = null;
         $data = $_POST;
-        $data['banner'] = $_FILES['banner']??null;
+        $data['banner'] = $_FILES['banner'] ?? null;
         $rules = [
             'token' => 'required|string',
             'title' => 'required|string',
@@ -186,7 +186,7 @@ class Product_api
         $request = null;
         $data = null;
         $data = $_POST;
-        $data['banner'] = $_FILES['banner']??null;
+        $data['banner'] = $_FILES['banner'] ?? null;
         $rules = [
             'token' => 'required|string',
             'id' => 'required|integer',
@@ -237,9 +237,9 @@ class Product_api
             $arr['content_group'] = "product";
             $arr['title'] = $request->title;
             $arr['price'] = $request->price;
-            if ($content->slug != $request->slug) {
-                $arr['slug'] = generate_slug(trim($request->slug));
-            }
+            // if ($content->slug != $request->slug) {
+            //     $arr['slug'] = generate_slug(trim($request->slug));
+            // }
             $arr['content'] = $request->content;
             $arr['parent_id'] = $request->category_id;
             $arr['updated_at'] = date('Y-m-d H:i:s');
@@ -264,20 +264,21 @@ class Product_api
                 $newimgs = array_merge($imsgjsn, $moreimg);
                 $arr['imgs'] = json_encode($newimgs);
             }
-
-            if ($request->banner['name'] != "" && $request->banner['error'] == 0) {
-                $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
-                $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
-                $dir = MEDIA_ROOT . "images/pages/" . $imgname;
-                $upload = move_uploaded_file($request->banner['tmp_name'], $dir);
-                if ($upload) {
-                    $arr['banner'] = $imgname;
-                    $old = obj($content);
-                    if ($old) {
-                        if ($old->banner != "") {
-                            $olddir = MEDIA_ROOT . "images/pages/" . $old->banner;
-                            if (file_exists($olddir)) {
-                                unlink($olddir);
+            if (isset($_FILES['banner'])) {
+                if ($request->banner['name'] != "" && $request->banner['error'] == 0) {
+                    $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
+                    $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
+                    $dir = MEDIA_ROOT . "images/pages/" . $imgname;
+                    $upload = move_uploaded_file($request->banner['tmp_name'], $dir);
+                    if ($upload) {
+                        $arr['banner'] = $imgname;
+                        $old = obj($content);
+                        if ($old) {
+                            if ($old->banner != "") {
+                                $olddir = MEDIA_ROOT . "images/pages/" . $old->banner;
+                                if (file_exists($olddir)) {
+                                    unlink($olddir);
+                                }
                             }
                         }
                     }
