@@ -65,7 +65,6 @@ class Product_api
         $request = null;
         $data = null;
         $data = $_POST;
-        $data['banner'] = $_FILES['banner'] ?? null;
         $rules = [
             'token' => 'required|string',
             'id' => 'required|integer'
@@ -80,6 +79,7 @@ class Product_api
         }
         $request = obj($data);
         $content = obj(getData(table: 'content', id: $request->id));
+        $req = $request;
         if ($content == false) {
             $_SESSION['msg'][] = "Object not found";
             $api['success'] = false;
@@ -88,8 +88,6 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-
-        $json_arr = array();
         $userCtrl = new Users_api;
         $user = $userCtrl->get_user_by_token($request->token);
         if (!$user) {
