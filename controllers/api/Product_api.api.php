@@ -356,6 +356,7 @@ class Product_api
         return array(
             'id' => $p->id,
             'title' => $p->title,
+            'content' => $p->content,
             'price' => $p->price,
             'banner' => img_or_null($p->banner),
             'images' => $images,
