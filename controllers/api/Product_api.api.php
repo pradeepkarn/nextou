@@ -443,7 +443,7 @@ class Product_api
     }
     function get_all_fav_products($user_id = null)
     {
-        $sql = "select content.* where content_group = 'product' and content.is_active = 1 and content.id = (select bookmarks.content_id from bookmarks where bookmarks.user_id = '$user_id' and content_group='fav')";
+        $sql = "select content.* from content where content_group = 'product' and content.is_active = 1 and content.id = (select bookmarks.content_id from bookmarks where bookmarks.user_id = '$user_id' and content_group='fav')";
         $product_array = $this->db->show($sql);
         $products = null;
         if ($product_array) {
