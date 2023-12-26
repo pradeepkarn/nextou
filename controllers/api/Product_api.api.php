@@ -108,14 +108,15 @@ class Product_api
             $is_fav = $db->findOne(['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id']]);
             if ($is_fav) {
                 $db->delete();
+                $api['data'] =  false;
                 msg_set('Favourite removed');
             } else {
                 $db->insertData = ['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id'], 'created_at' => $created_at];
                 $db->create();
+                $api['data'] =  true;
                 msg_set('Favourite saved');
             }
             $api['success'] = true;
-            $api['data'] =  [];
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
             exit;
