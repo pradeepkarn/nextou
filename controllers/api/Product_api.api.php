@@ -69,13 +69,11 @@ class Product_api
         $token = isset($headers['user_token']) ? $headers['user_token'] : null;
         $userapi = new Users_api;
         $user = $userapi->get_user_by_token($token);
-        // if ($user) {
-        //     $user_id = $user['id'];
-        // }
-
-       
-
-        $products = $this->product_details($req->id, $user_id = null);
+        $user_id = null;
+        if ($user) {
+            $user_id = $user['id'];
+        }
+        $products = $this->product_details($req->id, $user_id);
         if ($products) {
             msg_set('Products fetched successfully');
             $api['success'] = true;
