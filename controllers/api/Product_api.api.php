@@ -64,13 +64,16 @@ class Product_api
             exit;
         }
         $req = obj($req);
+        $headers = getallheaders();
+        // myprint($headers);
+        $token = isset($headers['user_token']) ? $headers['user_token'] : null;
+        $userapi = new Users_api;
+        $user = $userapi->get_user_by_token($token);
         // if ($user) {
         //     $user_id = $user['id'];
         // }
 
-        $headers = getallheaders();
-        myprint($headers);
-        $token = isset($headers['user_token']) ? $headers['user_token'] : null;
+       
 
         $products = $this->product_details($req->id, $user_id = null);
         if ($products) {
