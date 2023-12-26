@@ -64,12 +64,12 @@ class Product_api
         header('Content-Type: application/json');
         $request = null;
         $data = null;
-        $data = $_POST;
+        $data = json_decode(file_get_contents('php://input'));
         $rules = [
             'token' => 'required|string',
             'id' => 'required|numeric'
         ];
-        $pass = validateData(data: $data, rules: $rules);
+        $pass = validateData(data: arr($data), rules: $rules);
         if (!$pass) {
             $api['success'] = false;
             $api['data'] =  null;
@@ -77,7 +77,7 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-        $request = obj($data);
+        $request = $data;
         $content = obj(getData(table: 'content', id: $request->id));
         $req = $request;
         if ($content == false) {
