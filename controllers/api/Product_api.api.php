@@ -59,6 +59,77 @@ class Product_api
             exit;
         }
     }
+    function mark_as_fav($req = null)
+    {
+        header('Content-Type: application/json');
+        $request = null;
+        $data = null;
+        $data = $_POST;
+        $data['banner'] = $_FILES['banner'] ?? null;
+        $rules = [
+            'token' => 'required|string',
+            'id' => 'required|integer'
+        ];
+        $pass = validateData(data: $data, rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $request = obj($data);
+        $content = obj(getData(table: 'content', id: $request->id));
+        if ($content == false) {
+            $_SESSION['msg'][] = "Object not found";
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+
+        $json_arr = array();
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($request->token);
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+
+
+        $created_at = date('Y-m-d H:i:s');
+
+        try {
+            $db = $this->db;
+            $db->tableName = "bookmarks";
+            $is_fav = $db->findOne(['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id']]);
+            if ($is_fav) {
+                $db->delete();
+                msg_set('Favourite removed');
+            } else {
+                $db->insertData = ['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id'], 'created_at' => $created_at];
+                $db->create();
+                msg_set('Favourite saved');
+            }
+            $api['success'] = true;
+            $api['data'] =  [];
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } catch (PDOException $e) {
+            msg_set('Product not saved/removed, check if any missing data');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
     function details($req = null)
     {
         header('Content-Type: application/json');
@@ -326,7 +397,7 @@ class Product_api
         echo json_encode($api);
         exit;
     }
-    function get_all_products($user_id=null)
+    function get_all_products($user_id = null)
     {
         $this->db->tableName = 'content';
         $arr['is_active'] = 1;
@@ -336,7 +407,7 @@ class Product_api
         if ($product_array) {
             foreach ($product_array as $key => $p) {
                 $p = obj($p);
-                $products[] = $this->format_product($p,$user_id);
+                $products[] = $this->format_product($p, $user_id);
             }
         }
         return  $products;
