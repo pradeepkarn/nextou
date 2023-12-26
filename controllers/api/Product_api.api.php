@@ -59,7 +59,7 @@ class Product_api
             exit;
         }
     }
-    function mark_as_fav($req = null)
+    function mark_as_favunfav($req = null)
     {
         header('Content-Type: application/json');
         $request = null;
@@ -67,7 +67,7 @@ class Product_api
         $data = $_POST;
         $rules = [
             'token' => 'required|string',
-            'id' => 'required|integer'
+            'id' => 'required|numeric'
         ];
         $pass = validateData(data: $data, rules: $rules);
         if (!$pass) {

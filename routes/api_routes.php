@@ -22,5 +22,5 @@ $api_routes = [
     "/api/v1/product/create" =>'Product_api@create@name.productCreateApi',
     "/api/v1/product/update" =>'Product_api@update@name.productUpdateApi',
     "/api/v1/product/create-review" =>'Review_api@create@name.reviewCreateApi',
-    "/api/v1/product/mark-fav-unfav" =>'Product_api@mark_as_fav@name.favUnfavApi',
+    "/api/v1/product/mark-fav-unfav" =>'Product_api@mark_as_favunfav@name.favUnfavApi',
 ];
