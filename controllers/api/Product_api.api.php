@@ -379,6 +379,7 @@ class Product_api
     }
     function is_fav_content($db, $user_id, $content_id)
     {
+        $db->tableName = "bookmarks";
         $fav = $db->findOne(['user_id' => $user_id, 'content_id' => $content_id, 'content_group' => 'fav']);
         if ($fav) {
             return true;
