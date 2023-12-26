@@ -17,6 +17,7 @@ $api_routes = [
 
     "/api/v1/product/list-categories" =>'Product_api@list_categories@name.productCatListAPi',
     "/api/v1/product/list" =>'Product_api@list@name.productListAPi',
+    "/api/v1/product/list-favs" =>'Product_api@list_favs@name.productFavListAPi',
     "/api/v1/product/details/{id}" =>'Product_api@details@name.producDetailsAPi',
 
     "/api/v1/product/create" =>'Product_api@create@name.productCreateApi',
