@@ -64,7 +64,15 @@ class Product_api
             exit;
         }
         $req = obj($req);
-        $products = $this->product_details($req->id);
+        // if ($user) {
+        //     $user_id = $user['id'];
+        // }
+
+        $headers = getallheaders();
+        myprint($headers);
+        $token = isset($headers['user_token']) ? $headers['user_token'] : null;
+
+        $products = $this->product_details($req->id, $user_id = null);
         if ($products) {
             msg_set('Products fetched successfully');
             $api['success'] = true;
@@ -332,7 +340,7 @@ class Product_api
         return  null;
     }
 
-    function product_details($id)
+    function product_details($id, $user_id = null)
     {
         $this->db->tableName = 'content';
         $arr['is_active'] = 1;
@@ -342,26 +350,40 @@ class Product_api
         $prod = null;
         if ($p) {
             $p = obj($p);
-            $prod = $this->format_product($p);
+            $prod = $this->format_product($p, $user_id);
         }
         return  $prod;
     }
-    function format_product(object $p)
+    function format_product(object $p, $user_id = null)
     {
         $seller = $this->db->showOne("select id,first_name,last_name,address from pk_user where pk_user.id = '$p->created_by'");
         $imgs = json_decode($p->imgs ?? '[]');
         $images = array_map(function ($img) {
             return img_or_null($img);
         }, $imgs);
+        $is_fav = null;
+        if ($user_id) {
+            $is_fav = $this->is_fav_content($this->db, $user_id, $p->id);
+        }
         return array(
             'id' => $p->id,
             'title' => $p->title,
             'content' => $p->content,
             'price' => $p->price,
+            'is_fav' => $is_fav,
             'banner' => img_or_null($p->banner),
             'images' => $images,
             'seller' => $seller
         );
+    }
+    function is_fav_content($db, $user_id, $content_id)
+    {
+        $fav = $db->findOne(['user_id' => $user_id, 'content_id' => $content_id, 'content_group' => 'fav']);
+        if ($fav) {
+            return true;
+        } else {
+            return false;
+        }
     }
     function upload_files($postid, $request, $user = null)
     {
