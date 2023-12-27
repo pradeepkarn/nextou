@@ -304,6 +304,7 @@ class Product_api
 
             $postid = (new Model('content'))->store($arr);
             if (intval($postid)) {
+                _note(message:"Product: {$postid} created",created_by:$user->id,cg:1,via:2);
                 $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
                 $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
                 $dir = MEDIA_ROOT . "images/pages/" . $imgname;
@@ -433,6 +434,7 @@ class Product_api
             }
             try {
                 (new Model('content'))->update($request->id, $arr);
+                _note(message:"Product: {$request->id} updated",created_by:$user['id'],cg:1,via:2);
                 msg_set('Product updated');
                 $api['success'] = true;
                 $api['data'] =  [];

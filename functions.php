@@ -1,4 +1,27 @@
 <?php
+function _note($db = new Dbobjects, $message = "Test", $created_by = 0, $cg = 1, $via = 0)
+{
+  $device = $_SERVER['HTTP_USER_AGENT'] ?? null;
+  $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+  try {
+    $db->tableName = "notifications";
+    $db->insertData = [
+      'message' => $message,
+      'user_id' => $created_by,
+      'created_at' => date('Y-m-d H:i:s'),
+      'content_group' => $cg,
+      'via' => $via,
+      'ip' => $ip,
+      'device_info' => $device,
+    ];
+    if ($db->create()) {
+      return true;
+    }
+  } catch (PDOException $e) {
+    return false;
+  }
+  return false;
+}
 function msg_ssn($var = 'msg', $return = false, $lnbrk = "\\n")
 {
   if (isset($_SESSION[$var])) {
@@ -76,7 +99,7 @@ function is_admin()
   }
   $account = new Account();
   $user = $account->getLoggedInAccount();
-  return in_array($user['user_group'],ADMIN_GROUP_LIST);
+  return in_array($user['user_group'], ADMIN_GROUP_LIST);
 }
 function has_access()
 {
@@ -85,7 +108,7 @@ function has_access()
   }
   $account = new Account();
   $user = $account->getLoggedInAccount();
-  return in_array($user['user_group'],DASHBOARD_GROUP_LIST);
+  return in_array($user['user_group'], DASHBOARD_GROUP_LIST);
 }
 function is_superuser()
 {
@@ -146,7 +169,7 @@ function pkAjax($button, $url, $data, $response, $event = 'click', $method = "po
   }
   echo $ajax;
 }
-function send_to_server($button, $data, $callback="commonCallbackHandler", $event = 'click')
+function send_to_server($button, $data, $callback = "commonCallbackHandler", $event = 'click')
 {
   $ajax = "<script>
   $(document).ready(function () {
@@ -894,7 +917,7 @@ function validateData($data, $rules)
           if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) {
             $errors[] = str_replace("_", " ", ucfirst($field)) . ' is required';
           } else {
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'csv','pdf'];
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'csv', 'pdf'];
             $extension = pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION);
             if (!in_array($extension, $allowedExtensions)) {
               $errors[] = 'Only files with extensions ' . implode(', ', $allowedExtensions) . ' are allowed for ' . $field;
@@ -1257,7 +1280,7 @@ function render_template($path, $data)
   $data = ob_get_clean();
   return $data;
 }
-function myComponent($path, $data=null, $root='admin')
+function myComponent($path, $data = null, $root = 'admin')
 {
   ob_start();
   import(var: "/apps/$root/components/" . $path, context: $data, many: true);
@@ -1463,7 +1486,7 @@ function lineBreakBySemicolon($inputString)
 }
 function calculateDistance($startLat, $startLon, $endLat, $endLon)
 {
-  if ($startLat=='' || $startLon=='' || $endLat =='' || $endLon == '') {
+  if ($startLat == '' || $startLon == '' || $endLat == '' || $endLon == '') {
     return null;
   }
   $accessToken = MAPBOX_ACCESS_TOKEN;

@@ -69,7 +69,6 @@ if (authenticate() == true) {
   $pass = false;
   define('PASS', $pass);
 }
-
 import("routes/routes.php");
 
 

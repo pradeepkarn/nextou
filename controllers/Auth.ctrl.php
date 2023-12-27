@@ -426,6 +426,7 @@ class Auth extends Main_ctrl
             $_SESSION['user_id'] = $user->id;
             $this->save_in_cookie($user->id);
             $_SESSION['msg'][] = 'Logged in success via username';
+            _note(message:"User ID: {$user->id} logged in using username: {$uniqcol}",created_by:$user->id,cg:2,via:1);
             msg_ssn("msg");
             return $user;
         }
@@ -441,6 +442,7 @@ class Auth extends Main_ctrl
             $this->save_in_cookie($user->id);
             $_SESSION['msg'][] = 'Logged in success via email';
             msg_ssn("msg");
+            _note(message:"User ID: {$user->id} logged in using email: {$uniqcol}",created_by:$user->id,cg:2,via:1);
             return $user;
         }
         $user = $userObj->filter_index(array('mobile' => $uniqcol, 'password' => md5($password)));
@@ -455,10 +457,12 @@ class Auth extends Main_ctrl
             $this->save_in_cookie($user->id);
             $_SESSION['msg'][] = 'Logged in success via mobile';
             msg_ssn("msg");
+            _note(message:"User ID: {$user->id} logged in using mobile: {$uniqcol}",created_by:$user->id,cg:2,via:1);
             return $user;
         } else {
             $_SESSION['msg'][] = 'Username or password wrong';
             msg_ssn("msg");
+            _note(message:"Failed login attempt for the user: {$uniqcol}",created_by:"0",cg:2,via:1);
             return false;
         }
     }
@@ -484,7 +488,9 @@ class Auth extends Main_ctrl
     }
     public function logout()
     {
+        $user = null;
         if (USER) {
+            $user = USER;
             $role = USER['role'];
         } else {
             $role = false;
@@ -501,6 +507,10 @@ class Auth extends Main_ctrl
         }
         // Destroy the session
         session_destroy();
+        if($user){
+            $user = obj($user);
+            _note(message:"User ID: {$user->id} logged out",created_by:$user->id,cg:2,via:1);
+        }
         if ($isadmin) {
             header("Location: /" . home . route('adminLogin'));
             exit;

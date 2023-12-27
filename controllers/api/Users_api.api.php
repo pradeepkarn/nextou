@@ -71,7 +71,9 @@ class Users_api
         }
 
         if ($user) {
+            _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit}",created_by:$user['id'],cg:2,via:2);
             if ($user['user_group'] != $req->ug) {
+                _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit} but invalid portal",created_by:$user['id'],cg:2,via:2);
                 $ok = false;
                 msg_set("Invalid login portal");
                 $api['success'] = false;
@@ -115,6 +117,7 @@ class Users_api
                 exit;
             }
         } else {
+            _note(message:"Login failed for: {$data->credit}",created_by:0,cg:2,via:2);
             msg_set("User not found");
             $api['success'] = false;
             $api['data'] = null;
@@ -397,6 +400,9 @@ class Users_api
                     $this->db->pk($userid);
                     $this->db->insertData = $filearr;
                     $this->db->update();
+                }
+                if ($userid) {
+                    _note(message:"New acoount: {$userid} created",created_by:$userid,cg:2,via:2);
                 }
                 msg_set('Account created');
                 $ok = true;
