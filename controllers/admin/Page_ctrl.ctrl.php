@@ -358,7 +358,7 @@ class Page_ctrl
     {
         import("apps/admin/layouts/admin-main.php", $context);
     }
-    // Post list
+    // page list
     public function page_list($ord = "DESC", $limit = 5, $active = 1, $sort_by = 'views')
     {
         $cntobj = new Model('content');

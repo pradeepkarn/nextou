@@ -72,7 +72,7 @@ class Users_api
 
         if ($user) {
             if ($user['user_group'] != $req->ug) {
-                _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit} but invalid portal",created_by:$user['id'],cg:2,via:2);
+                _note(message: "User ID: {$user['id']} logged in using credit: {$data->credit} but invalid portal", created_by: $user['id'], cg: 2, via: 2);
                 $ok = false;
                 msg_set("Invalid login portal");
                 $api['success'] = false;
@@ -81,10 +81,10 @@ class Users_api
                 echo json_encode($api);
                 exit;
             }
-            _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit}",created_by:$user['id'],cg:2,via:2);
+            _note(message: "User ID: {$user['id']} logged in using credit: {$data->credit}", created_by: $user['id'], cg: 2, via: 2);
             $create_token = false;
             $after_second = 10 * 60;
-            if ($user['app_login_token']=='') {
+            if ($user['app_login_token'] == '') {
                 $create_token = true;
             }
             $app_login_time = strtotime($user['app_login_time'] ?? date('Y-m-d H:i:s'));
@@ -117,7 +117,7 @@ class Users_api
                 exit;
             }
         } else {
-            _note(message:"Login failed for: {$data->credit}",created_by:0,cg:2,via:2);
+            _note(message: "Login failed for: {$data->credit}", created_by: 0, cg: 2, via: 2);
             msg_set("User not found");
             $api['success'] = false;
             $api['data'] = null;
@@ -216,10 +216,14 @@ class Users_api
                 }
 
                 msg_set('Account updated');
+                _note(message: "User ID: {$user->id} updated account", created_by: $user->id, cg: 2, via: 2);
                 $ok = true;
                 $pdo->commit();
             } catch (PDOException $th) {
                 $pdo->rollBack();
+                if (isset($user->id)) {
+                    _note(message: "User ID: {$user->id} tried to update account but not updated", created_by: $user->id, cg: 2, via: 2);
+                }
                 msg_set('Account not updated');
                 $ok = false;
             }
@@ -402,7 +406,7 @@ class Users_api
                     $this->db->update();
                 }
                 if ($userid) {
-                    _note(message:"New acoount: {$userid} created",created_by:$userid,cg:2,via:2);
+                    _note(message: "New acoount: {$userid} created", created_by: $userid, cg: 2, via: 2);
                 }
                 msg_set('Account created');
                 $ok = true;

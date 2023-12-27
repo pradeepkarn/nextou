@@ -146,4 +146,6 @@ $admin_routes = [
     '/admin/qrdata/trash/{id}' => 'QR_ctrl@move_to_trash@name.qrdataTrash',
     '/admin/qrdata/restore/{id}' => 'QR_ctrl@restore@name.qrdataRestore',
     '/admin/qrdata/delete/{id}' => 'QR_ctrl@delete@name.qrdataDelete',
+    // logs
+    '/admin/log/list' => 'Logs_ctrl@list@name.logList',
 ];
