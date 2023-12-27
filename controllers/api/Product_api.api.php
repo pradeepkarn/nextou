@@ -21,7 +21,36 @@ class Product_api
         if ($user) {
             $user_id = $user['id'];
         }
-        $products = $this->get_all_products($user_id);
+        $products = $this->get_all_products($liked_by=$user_id);
+        if ($products) {
+            msg_set('Products fetched successfully');
+            $api['success'] = true;
+            $api['data'] = $products;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('Product not found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
+    function list_my_products($req = null)
+    {
+        $req = obj($req);
+        header('Content-Type: application/json');
+        $headers = $this->headers;
+        $token = isset($headers['user_token']) ? $headers['user_token'] : null;
+        $userapi = new Users_api;
+        $user = $userapi->get_user_by_token($token);
+        $user_id = null;
+        if ($user) {
+            $user_id = $user['id'];
+        }
+        $products = $this->get_my_products($user_id);
         if ($products) {
             msg_set('Products fetched successfully');
             $api['success'] = true;
@@ -426,7 +455,7 @@ class Product_api
         echo json_encode($api);
         exit;
     }
-    function get_all_products($user_id = null)
+    function get_all_products($liked_by = null)
     {
         $this->db->tableName = 'content';
         $arr['is_active'] = 1;
@@ -436,7 +465,26 @@ class Product_api
         if ($product_array) {
             foreach ($product_array as $key => $p) {
                 $p = obj($p);
-                $products[] = $this->format_product($p, $user_id);
+                $products[] = $this->format_product($p, $liked_by);
+            }
+        }
+        return  $products;
+    }
+    function get_my_products($created_by = null)
+    {
+        if (!$created_by) {
+            return null;
+        }
+        $this->db->tableName = 'content';
+        $arr['is_active'] = 1;
+        $arr['content_group'] = 'product';
+        $arr['created_by'] = $created_by;
+        $product_array = $this->db->filter($arr);
+        $products = null;
+        if ($product_array) {
+            foreach ($product_array as $key => $p) {
+                $p = obj($p);
+                $products[] = $this->format_product($p);
             }
         }
         return  $products;
