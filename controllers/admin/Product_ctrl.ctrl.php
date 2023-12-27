@@ -296,6 +296,7 @@ class Product_ctrl
             }
             try {
                 (new Model('content'))->update($request->id, $arr);
+                _note(message: "Product: {$request->id} updated", created_by: USER['id'], cg: 1, via: 1);
                 echo js_alert('Product updated');
                 echo go_to(route('productEdit', ['id' => $request->id]));
                 exit;
@@ -386,6 +387,7 @@ class Product_ctrl
             $content_exists = (new Model('content'))->exists(['id' => $req->id, 'is_active' => 0]);
             if ($content_exists) {
                 if ((new Model('content'))->destroy($req->id)) {
+                    _note(message: "Product: {$req->id} deleted permanantly", created_by: USER['id'], cg: 1, via: 1);
                     echo js_alert('Content deleted permanatly');
                     echo go_to(route('productTrashList'));
                     exit;

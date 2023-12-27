@@ -85,7 +85,7 @@ $active = $context->is_active;
                                     <th scope="row"><?php echo $pv->id; ?></th>
                                     <td><?php echo $pv->message; ?></td>
                                     <td><?php echo $pv->device_info; ?></td>
-                                    <td><?php echo $pv->device_id??"NA";?></td>
+                                    <td><?php echo $pv->device_id ?? "NA"; ?></td>
                                     <td><?php echo $pv->created_at; ?></td>
                                 </tr>
 
