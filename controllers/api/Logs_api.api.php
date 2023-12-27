@@ -20,7 +20,7 @@ class Logs_ctrl
         if ($user) {
             $user_id = $user['id'];
         }
-        $products = $this->log_list($liked_by = $user_id);
+        $products = $this->log_list($user_id = $user_id);
         if ($products) {
             msg_set('Log list fetched successfully');
             $api['success'] = true;
@@ -38,12 +38,12 @@ class Logs_ctrl
         }
     }
     // Post list
-    public function log_list($ord = "DESC", $limit = 5, $sort_by = 'id')
+    public function log_list($user_id, $ord = "DESC", $limit = 5, $sort_by = 'id')
     {
         $cntobj = new Model('notifications');
-        return $cntobj->index($ord, $limit, $change_order_by_col = $sort_by);
+        return $cntobj->filter_index(['user_id' => $user_id], $ord, $limit, $change_order_by_col = $sort_by);
     }
-    public function log_search_list($keyword, $ord = "DESC", $limit = 5)
+    public function log_search_list($user_id, $keyword, $ord = "DESC", $limit = 5)
     {
         $cntobj = new Model('notifications');
         $search_arr['deviece_info'] = $keyword;
@@ -52,7 +52,8 @@ class Logs_ctrl
         return $cntobj->search(
             assoc_arr: $search_arr,
             ord: $ord,
-            limit: $limit
+            limit: $limit,
+            whr_arr: ['user_id' => $user_id]
         );
     }
 }
