@@ -71,7 +71,6 @@ class Users_api
         }
 
         if ($user) {
-            _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit}",created_by:$user['id'],cg:2,via:2);
             if ($user['user_group'] != $req->ug) {
                 _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit} but invalid portal",created_by:$user['id'],cg:2,via:2);
                 $ok = false;
@@ -82,6 +81,7 @@ class Users_api
                 echo json_encode($api);
                 exit;
             }
+            _note(message:"User ID: {$user['id']} logged in using credit: {$data->credit}",created_by:$user['id'],cg:2,via:2);
             $create_token = false;
             $after_second = 10 * 60;
             if ($user['app_login_token']=='') {
