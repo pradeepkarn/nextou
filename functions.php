@@ -1,6 +1,10 @@
 <?php
 function _note($db = new Dbobjects, $message = "Test", $created_by = 0, $cg = 1, $via = 0)
 {
+  $sys_id = null;
+  if (isset($_COOKIE['sys_id'])) {
+    $sys_id = $_COOKIE['sys_id'];
+  }
   $device = $_SERVER['HTTP_USER_AGENT'] ?? null;
   $ip = $_SERVER['REMOTE_ADDR'] ?? null;
   try {
@@ -13,6 +17,7 @@ function _note($db = new Dbobjects, $message = "Test", $created_by = 0, $cg = 1,
       'via' => $via,
       'ip' => $ip,
       'device_info' => $device,
+      'device_id' => $sys_id
     ];
     if ($db->create()) {
       return true;

@@ -14,6 +14,9 @@ define('DEFAULT_LANG', 'en');
 $home = home;
 $languages = ["hi", "en"];
 define('LANG_ARR',$languages);
+if (!isset($_COOKIE['sys_id'])) {
+  setcookie("sys_id", uniqid('sys_'), time() + (86400 * 30 * 12), "/"); // 86400 = 1 day
+}
 if (!isset($_COOKIE['lang'])) {
   setcookie('lang', DEFAULT_LANG, time() + (86400 * 30 * 12), "/");
 }
