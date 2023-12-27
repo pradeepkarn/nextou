@@ -1,5 +1,5 @@
 <?php
-class Logs_ctrl
+class Logs_api
 {
     public $db;
     private $headers;
