@@ -17,4 +17,6 @@ $api_routes = [
     "/api/v1/product/create-review" =>'Review_api@create@name.reviewCreateApi',
     "/api/v1/product/mark-fav-unfav" =>'Product_api@mark_as_favunfav@name.favUnfavApi',
     "/api/v1/product/list-my-products" =>'Product_api@list_my_products@name.listMyProdsApi',
+    // logs
+    '/api/v1/log/list' => 'Logs_api@list@name.logListApi',
 ];
