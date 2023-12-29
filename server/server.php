@@ -22,6 +22,7 @@ try {
 
     $server->run();
 } catch (Exception $e) {
+    echo $e;
     // Handle the exception as needed, you can log it or perform other actions
     // but don't let it stop the server from running
     // echo "An error occurred: " . $e->getMessage();
