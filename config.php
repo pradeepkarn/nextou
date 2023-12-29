@@ -6,7 +6,7 @@ $env = (object) $dotenv->load();
 define("TIME_ZONE",$env->TIME_ZONE);
 date_default_timezone_set(TIME_ZONE);
 #server host name or simply leave it as it is
-// define("MY_DOMAIN",$env->MY_DOMAIN);
+define("MY_DOMAIN",$env->MY_DOMAIN);
 // define("SERVER_DOMAIN",$env->SERVER_DOMAIN);
 #server host name or simply leave it as it is
 define("PK_DB_HOST",$env->DB_HOST);

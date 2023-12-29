@@ -2,7 +2,7 @@
 
 class Chat_front
 {
-    function init($link = 'ws://localhost:' . WS_PORT)
+    function init($link = 'ws://' . MY_DOMAIN . ':' . WS_PORT)
     { ?>
         <style>
             #chat-container {
@@ -26,9 +26,7 @@ class Chat_front
                 list-style-type: none;
                 padding: 0;
                 margin: 0;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                overflow-y: auto;
+                overflow-y: scroll;
                 max-height: 300px;
             }
 
@@ -36,6 +34,8 @@ class Chat_front
             #chat li {
                 padding: 10px;
                 border-bottom: 1px solid #eee;
+                border: 1px solid #ccc;
+                border-radius: 5px;
             }
 
             #msg-field {
@@ -82,27 +82,34 @@ class Chat_front
             <button onclick="toggleChat()" id="expand-button">-</button>
             <ul id="user-list"></ul>
             <ul id="chat"></ul>
-            <div id="msg-field">
-                <input type="text" id="message" placeholder="Type your message">
-                <button onclick="sendMessage()">Send</button>
+        </div>
+        <div id="msg-field">
+            <div class="history-box">
+
             </div>
-
-
+            <input type="text" id="message" placeholder="Type your message">
+            <button onclick="sendMessage()">Send</button>
         </div>
         <script>
+            function openChatPopup() {
+                const message = document.getElementById('msg-field');
+                message.style.display = "block";
+                message.style.display = "none";
+            }
+
             function toggleChat() {
                 const chatContainer = document.getElementById('chat-container');
                 const expandButton = document.getElementById('expand-button');
-                const message = document.getElementById('msg-field');
+
 
                 if (chatContainer.style.height === '0px' || chatContainer.style.height === '') {
                     chatContainer.style.height = '300px';
                     expandButton.textContent = '-';
-                    message.style.display = "block";
+
                 } else {
                     chatContainer.style.height = '0px';
                     expandButton.textContent = '+';
-                    message.style.display = "none";
+
                 }
             }
             toggleChat();
