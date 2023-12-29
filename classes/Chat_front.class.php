@@ -2,7 +2,7 @@
 
 class Chat_front
 {
-    function init($link = 'ws://' . MY_DOMAIN . ':' . WS_PORT)
+    function init($link = 'wss://' . MY_DOMAIN . ':' . WS_PORT)
     { ?>
         <style>
             #chat-container {
