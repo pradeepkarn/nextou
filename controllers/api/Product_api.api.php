@@ -794,9 +794,11 @@ class Product_api
     function chat_user_list($db = new Dbobjects, $myid)
     {
         try {
-            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) as receiver_id, 
-            pk_user.image, 
-            pk_user.username
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) as receiver_id,
+            pk_user.first_name,
+            pk_user.last_name,
+            chat_history.created_at,
+            pk_user.image
      FROM chat_history 
      JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id'))
      WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
@@ -805,6 +807,9 @@ class Product_api
             $hist = $db->show($sql);
             return array_map(function ($h) {
                 $h['image'] = dp_or_null($h['image']);
+                if (isset($h['created_at'])) {
+                    $h['created_at'] = strtotime($h['created_at']);
+                }
                 return $h;
             }, $hist);
         } catch (\PDOException $th) {
