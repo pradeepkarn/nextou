@@ -804,7 +804,7 @@ class Product_api
             //  WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
             //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
             //  ORDER BY chat_history.created_at;";
-            $sql = "select * from chat_history where WHERE 
+            $sql = "select * from chat_history where
 (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
  OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid');";
 
