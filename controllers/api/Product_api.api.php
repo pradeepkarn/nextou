@@ -675,7 +675,7 @@ class Product_api
                 unset($h['jsn']);
                 unset($h['users']);
                 unset($h['message']);
-                return $h;
+                return $h['chat_obj'];
             }, $hist);
         } catch (\PDOException $th) {
             return null;
