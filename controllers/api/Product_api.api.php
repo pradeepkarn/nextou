@@ -794,14 +794,14 @@ class Product_api
     function chat_user_list($db = new Dbobjects, $myid)
     {
         try {
-            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) as receiver_id, 
-               pk_user.image, 
-               pk_user.username
-        FROM chat_history 
-        JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id'))
-        WHERE (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
-           OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
-        ORDER BY created_at;";
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) as receiver_id, 
+            pk_user.image, 
+            pk_user.username
+     FROM chat_history 
+     JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id'))
+     WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
+        OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
+     ORDER BY chat_history.created_at;";
             return $db->show($sql);
         } catch (\PDOException $th) {
             return null;
