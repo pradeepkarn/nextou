@@ -722,7 +722,7 @@ class Product_api
             exit;
         }
         if ($user['id'] == $req->seller_id) {
-            msg_set('Please check receiver id');
+            msg_set('Please check seller id');
             $api['success'] = false;
             $api['data'] =  null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
