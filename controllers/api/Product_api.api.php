@@ -662,7 +662,7 @@ class Product_api
             "sender_id" => $user->id,
             "receiver_id" => $receiver->id,
             "message" => $req->message,
-            "created_at" =>  date("Y-m-d H:i:s", $req->created_at)
+            "created_at" =>  date("Y-m-d H:i:s", abs($req->created_at))
         ));
         if ($was_saved) {
             msg_set('Data saved');
@@ -805,7 +805,7 @@ class Product_api
             //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
             //  ORDER BY chat_history.created_at;";
 
-    $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
     MAX(u.first_name) as first_name,
     MAX(u.last_name) as last_name,
     MAX(ch.message) as last_message,
