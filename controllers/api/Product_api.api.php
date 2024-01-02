@@ -810,9 +810,9 @@ class Product_api
                 $msgarr['message'] = $h['message'];
 
                 if ($h['sender_id'] == $myid) {
-                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id'])['id'];
                 } else {
-                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id']);
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id'])['id'];
                 }
 
                 if (isset($h['created_at'])) {
