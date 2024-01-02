@@ -809,7 +809,7 @@ class Product_api
     MAX(u.first_name) as first_name,
     MAX(u.last_name) as last_name,
     MAX(ch.message) as last_message,
-    MAX(ch.id),
+    MAX(ch.id) as chat_id,
     MAX(ch.created_at) as last_created_at,
     MAX(u.image) as image
     FROM chat_history ch
