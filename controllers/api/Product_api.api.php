@@ -674,6 +674,7 @@ class Product_api
                 $h['jsn'] = json_decode($h['jsn']);
                 unset($h['jsn']);
                 unset($h['message']);
+                return $h;
             }, $hist);
         } catch (\PDOException $th) {
             return null;
