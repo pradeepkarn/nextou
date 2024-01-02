@@ -671,7 +671,7 @@ class Product_api
                 return null;
             }
             return array_map(function ($h) {
-                $h['chat_obj'] = json_decode($h['jsn']);
+                $h['chat_obj'] = json_decode($h['jsn'],true);
                 if (isset($h['chat_obj']['created_at'])) {
                     $h['chat_obj']['created_at'] = strtotime($h['chat_obj']['created_at']);
                 }
