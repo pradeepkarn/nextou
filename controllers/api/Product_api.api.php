@@ -794,29 +794,28 @@ class Product_api
     function chat_user_list($db = new Dbobjects, $myid)
     {
         try {
-    //         $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) as receiver_id,
-    //         pk_user.first_name,
-    //         pk_user.last_name,
-    //         chat_history.created_at,
-    //         pk_user.image
-    //  FROM chat_history 
-    //  JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id'))
-    //  WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
-    //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
-    //  ORDER BY chat_history.created_at;";
+            //         $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) as receiver_id,
+            //         pk_user.first_name,
+            //         pk_user.last_name,
+            //         chat_history.created_at,
+            //         pk_user.image
+            //  FROM chat_history 
+            //  JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id'))
+            //  WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
+            //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
+            //  ORDER BY chat_history.created_at;";
 
-            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) as receiver_id,
-     MAX(pk_user.first_name) as first_name,
-     MAX(pk_user.last_name) as last_name,
-     MAX(chat_history.created_at) as last_created_at,
-     MAX(pk_user.image) as image
-FROM chat_history
-JOIN pk_user ON pk_user.id = JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id'))
-WHERE (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
-  OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
-GROUP BY receiver_id
-ORDER BY last_created_at DESC;
-";
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
+    MAX(u.first_name) as first_name,
+    MAX(u.last_name) as last_name,
+    MAX(ch.created_at) as last_created_at,
+    MAX(u.image) as image
+    FROM chat_history ch
+    JOIN pk_user u ON u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id'))
+    WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
+        OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
+    GROUP BY receiver_id
+    ORDER BY last_created_at DESC;";
             $hist = $db->show($sql);
             return array_map(function ($h) {
                 $h['image'] = dp_or_null($h['image']);
