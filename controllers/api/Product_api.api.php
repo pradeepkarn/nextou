@@ -804,34 +804,46 @@ class Product_api
             //  WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
             //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
             //  ORDER BY chat_history.created_at;";
+            $sql = "select * from chat_history where WHERE 
+(JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
+ OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid');";
 
-            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id, 
-            JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) as sender_id
-    MAX(u.first_name) as first_name,
-    MAX(u.last_name) as last_name,
-    MAX(ch.message) as last_message,
-    MAX(ch.id) as chat_id,
-    MAX(ch.created_at) as last_created_at,
-    MAX(u.image) as image
-FROM chat_history ch
-JOIN pk_user u ON
-    CASE
-        WHEN JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid' THEN u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id'))
-        ELSE u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id'))
-    END
-WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
-    OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
-GROUP BY receiver_id
-ORDER BY ch.id DESC;
-";
+            //             $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id, 
+            //             JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) as sender_id
+            //     MAX(u.first_name) as first_name,
+            //     MAX(u.last_name) as last_name,
+            //     MAX(ch.message) as last_message,
+            //     MAX(ch.id) as chat_id,
+            //     MAX(ch.created_at) as last_created_at,
+            //     MAX(u.image) as image
+            // FROM chat_history ch
+            // JOIN pk_user u ON
+            //     CASE
+            //         WHEN JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid' THEN u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id'))
+            //         ELSE u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id'))
+            //     END
+            // WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
+            //     OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
+            // GROUP BY receiver_id
+            // ORDER BY ch.id DESC;
+            // ";
             $hist = $db->show($sql);
-            return array_map(function ($h) {
-                $h['image'] = dp_or_null($h['image']);
-                if (isset($h['last_created_at'])) {
-                    $h['last_created_at'] = strtotime($h['last_created_at']);
+            $returnarr = null;
+            foreach ($hist as $key => $h) {
+                $h = json_decode($h['jsn'],true);
+                // $h['image'] = dp_or_null($h['image']);
+                $msgarr['contact'] = $h['message'];
+                if ($h['sender_id']==$myid) {
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
+                }else{
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id']);
                 }
-                return $h;
-            }, $hist);
+                if (isset($h['created_at'])) {
+                    $msgarr['created_at'] = strtotime($h['created_at']);
+                }
+                $returnarr[] = $msgarr;
+            }
+            return $returnarr;
         } catch (\PDOException $th) {
             return null;
         }
