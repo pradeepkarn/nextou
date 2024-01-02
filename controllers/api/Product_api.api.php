@@ -816,7 +816,7 @@ class Product_api
     WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
         OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
     GROUP BY receiver_id
-    ORDER BY last_created_at DESC;";
+    ORDER BY ch.id DESC;";
             $hist = $db->show($sql);
             return array_map(function ($h) {
                 $h['image'] = dp_or_null($h['image']);
