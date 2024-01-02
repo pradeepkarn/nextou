@@ -802,34 +802,41 @@ class Product_api
             ";
             $hist = $db->show($sql);
             $returnarr = [];
-            $uniqueArr = [];
-
+            $uniqueContacts = [];
+            
             foreach ($hist as $key => $h) {
                 $msgarr = null;
                 $h = json_decode($h['jsn'], true);
                 $msgarr['message'] = $h['message'];
-
+            
                 if ($h['sender_id'] == $myid) {
-                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id'])['id'];
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
                 } else {
-                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id'])['id'];
+                    $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id']);
                 }
-
+            
                 if (isset($h['created_at'])) {
                     $msgarr['created_at'] = strtotime($h['created_at']);
                 }
-
+            
                 $returnarr[] = $msgarr;
             }
-
-            // Iterate over the array to check for uniqueness
+            
+            // Iterate over the array and check for uniqueness based on the "contact" information
             foreach ($returnarr as $arr) {
-                if (!in_array($arr, $uniqueArr, true)) {
-                    $uniqueArr[] = $arr;
+                $contactId = $arr['contact']['id'];
+                
+                // Check if the contact ID is not already present in the $uniqueContacts array
+                if (!isset($uniqueContacts[$contactId])) {
+                    $uniqueContacts[$contactId] = $arr;
                 }
             }
-
+            
+            // Reset array keys to maintain a sequential array
+            $uniqueArr = array_values($uniqueContacts);
+            
             return $uniqueArr;
+            
         } catch (\PDOException $th) {
             return null;
         }
