@@ -804,7 +804,6 @@ class Product_api
             $returnarr = null;
             foreach ($hist as $key => $h) {
                 $h = json_decode($h['jsn'],true);
-                // $h['image'] = dp_or_null($h['image']);
                 $msgarr['contact'] = $h['message'];
                 if ($h['sender_id']==$myid) {
                     $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
@@ -816,7 +815,7 @@ class Product_api
                 }
                 $returnarr[] = $msgarr;
             }
-            return $returnarr;
+            return array_unique($returnarr);
         } catch (\PDOException $th) {
             return null;
         }
