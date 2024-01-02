@@ -721,6 +721,14 @@ class Product_api
             echo json_encode($api);
             exit;
         }
+        if ($user['id'] == $req->seller_id) {
+            msg_set('Please check receiver id');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
         $user = obj($user);
         $chat = $this->chat_history($this->db, $myid = $user->id, $sellerid = $req->seller_id);
         if ($chat) {
