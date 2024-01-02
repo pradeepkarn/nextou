@@ -801,7 +801,7 @@ class Product_api
             ORDER BY id DESC;
             ";
             $hist = $db->show($sql);
-            $returnarr = null;
+            $returnarr = [];
             foreach ($hist as $key => $h) {
                 $h = json_decode($h['jsn'],true);
                 $msgarr['contact'] = $h['message'];
