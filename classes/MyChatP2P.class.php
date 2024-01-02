@@ -99,6 +99,28 @@ class MyChatP2P implements MessageComponentInterface
             return false;
         }
     }
+    function get_chat_history($db = new Dbobjects, $myid)
+    {
+        try {
+            $sql = "SELECT *
+            FROM chat_history
+            WHERE JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
+               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid'
+            ORDER BY created_at;
+            ";
+            $hist = $db->show($sql);
+            if (!$hist) {
+                return null;
+            }
+            return array_map(function ($h) {
+                $h['jsn'] = json_decode($h['jsn']);
+                unset($h['jsn']);
+            }, $hist);
+        } catch (\PDOException $th) {
+            return null;
+        }
+        return null;
+    }
 
     function friendship_exists($obj)
     {

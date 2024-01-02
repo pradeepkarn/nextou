@@ -21,7 +21,7 @@ class Product_api
         if ($user) {
             $user_id = $user['id'];
         }
-        $products = $this->get_all_products($liked_by=$user_id);
+        $products = $this->get_all_products($liked_by = $user_id);
         if ($products) {
             msg_set('Products fetched successfully');
             $api['success'] = true;
@@ -304,7 +304,7 @@ class Product_api
 
             $postid = (new Model('content'))->store($arr);
             if (intval($postid)) {
-                _note(message:"Product: {$postid} created",created_by:$user->id,cg:1,via:2);
+                _note(message: "Product: {$postid} created", created_by: $user->id, cg: 1, via: 2);
                 $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
                 $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
                 $dir = MEDIA_ROOT . "images/pages/" . $imgname;
@@ -434,7 +434,7 @@ class Product_api
             }
             try {
                 (new Model('content'))->update($request->id, $arr);
-                _note(message:"Product: {$request->id} updated",created_by:$user['id'],cg:1,via:2);
+                _note(message: "Product: {$request->id} updated", created_by: $user['id'], cg: 1, via: 2);
                 msg_set('Product updated');
                 $api['success'] = true;
                 $api['data'] =  [];
@@ -495,7 +495,7 @@ class Product_api
     {
         $sql = "select bookmarks.content_id from bookmarks where bookmarks.user_id = '$user_id' and content_group='fav'";
         $content_ids = $this->db->show($sql);
-        if(!$content_ids){
+        if (!$content_ids) {
             return null;
         }
         $ids = array_column($content_ids, 'content_id');
@@ -610,5 +610,73 @@ class Product_api
         } else {
             return false;
         }
+    }
+    function chat_hist_api($req = null)
+    {
+        header('Content-Type: application/json');
+        $req = json_decode(file_get_contents('php://input'));
+        $rules = [
+            'token' => 'required|string',
+            'seller_id' => 'required|integer',
+        ];
+        $pass = validateData(data: arr($req), rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($req->token);
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $user = obj($user);
+        $chat = $this->chat_history($this->db, $myid = $user->id, $sellerid = $req->seller_id);
+        if ($chat) {
+            msg_set('Chat history found');
+            $api['success'] = true;
+            $api['data'] =  $chat;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('No Chat history found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
+    function chat_history($db = new Dbobjects, $myid, $sellerid)
+    {
+        try {
+            $sql = "SELECT *
+            FROM chat_history
+            WHERE (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
+               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$sellerid') OR
+               (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$sellerid'
+               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
+            ORDER BY created_at;
+            ";
+            $hist = $db->show($sql);
+            if (!$hist) {
+                return null;
+            }
+            return array_map(function ($h) {
+                $h['jsn'] = json_decode($h['jsn']);
+                unset($h['jsn']);
+            }, $hist);
+        } catch (\PDOException $th) {
+            return null;
+        }
+        return null;
     }
 }
