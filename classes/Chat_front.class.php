@@ -2,7 +2,123 @@
 
 class Chat_front
 {
-    function init($link = WS_LINK)
+    function init()
+    { ?>
+     <div id="output"></div>
+        <script>
+            const socket = new WebSocket('wss://free.blr2.piesocket.com/v3/1?api_key=i7RXtDu0SNnm9uv6oNSId9vU0IdsVyr4V7rxQekC&notify_self=1');
+
+            // Connection opened
+            socket.addEventListener('open', (event) => {
+                console.log('WebSocket connection opened:', event);
+
+                // Send a message to the server
+                socket.send('Hello, Server!');
+            });
+
+            // Listen for messages from the server
+            socket.addEventListener('message', (event) => {
+                console.log('Message from server:', event.data);
+
+                // Display the received message on the page
+                document.getElementById('output').innerHTML = `Message from server: ${event.data}`;
+            });
+
+            // Connection closed
+            socket.addEventListener('close', (event) => {
+                console.log('WebSocket connection closed:', event);
+            });
+
+            // Handle errors
+            socket.addEventListener('error', (event) => {
+                console.error('WebSocket error:', event);
+            });
+        </script>
+    <?php }
+    function init3()
+    { ?>
+        <style>
+            div {
+                margin: 10px;
+            }
+
+            #chatFormContainer {
+                text-align: center;
+                position: fixed;
+                bottom: 5px;
+                left: 5px;
+                right: 5px;
+            }
+
+            #chatFormContainer input {
+                display: inline-block;
+                width: 90%;
+                padding: 20px;
+            }
+        </style>
+        <div id="chatLog">
+
+        </div>
+        <div id="chatFormContainer">
+            <form id="chatForm">
+                <input id="chatMessage" placeholder="Type  message and press enter..." type="text">
+            </form>
+        </div>
+        <script>
+            var username = "user_" + (Math.floor(Math.random() * 1000));
+            var chatLog = document.getElementById('chatLog');
+            var chatForm = document.getElementById('chatForm');
+            chatForm.addEventListener("submit", sendMessage);
+
+            var piesocket = new PieSocket({
+                clusterId: 'free.blr2',
+                apiKey: 'uVdP9q7l86MNlZ79Nk8rzKzKgxDEiS8M5lWFhwQX',
+                notifySelf: true,
+                presence: true,
+                userId: username
+            });
+
+            var channel;
+            piesocket.subscribe("chat-room").then(ch => {
+                channel = ch;
+
+                channel.listen("system:member_joined", function(data) {
+                    if (data.member.user == username) {
+                        data.member.user = "<b>You</b>";
+                    }
+
+                    chatLog.insertAdjacentHTML('afterend', `<div> ${data.member.user} joined the chat<div>`);
+                })
+
+                channel.listen("new_message", function(data, meta) {
+                    if (data.sender == username) {
+                        data.sender = "<b>You</b>";
+                    }
+
+                    chatLog.insertAdjacentHTML('afterend', `<div> ${data.sender}: ${data.text} <div>`);
+                })
+
+            });
+
+            function sendMessage(e) {
+                e.preventDefault();
+
+                if (!channel) {
+                    alert("Channel is not connected yet, wait a sec");
+                    return;
+                }
+
+                var message = document.getElementById('chatMessage').value;
+
+                channel.publish("new_message", {
+                    sender: username,
+                    text: message
+                });
+            }
+        </script>
+    <?php
+    }
+    function init2($link = "wss://free.blr2.piesocket.com/v3/1?api_key=i7RXtDu0SNnm9uv6oNSId9vU0IdsVyr4V7rxQekC&notify_self=1")
     { ?>
         <style>
             #chat-container {
