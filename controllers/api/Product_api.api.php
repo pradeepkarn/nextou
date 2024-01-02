@@ -808,6 +808,7 @@ class Product_api
     $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
     MAX(u.first_name) as first_name,
     MAX(u.last_name) as last_name,
+    MAX(ch.message) as last_message,
     MAX(ch.created_at) as last_created_at,
     MAX(u.image) as image
     FROM chat_history ch
