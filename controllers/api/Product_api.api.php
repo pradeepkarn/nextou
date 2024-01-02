@@ -611,6 +611,90 @@ class Product_api
             return false;
         }
     }
+    function chat_save_api($req = null)
+    {
+        header('Content-Type: application/json');
+        $req = json_decode(file_get_contents('php://input'));
+        $rules = [
+            'token' => 'required|string',
+            'seller_id' => 'required|integer',
+            'message' => 'required|integer',
+            'created_at' => 'required|integer',
+        ];
+        $pass = validateData(data: arr($req), rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($req->token);
+        $seller = $userCtrl->get_user_by_id($req->seller_id);
+        if (!$seller) {
+            msg_set('Seller not found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        if ($user['id'] == $seller['id']) {
+            msg_set('You can not chat to yourself');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $user = obj($user);
+        $seller = obj($seller);
+        $was_saved = $this->save_chat_in_db($this->db, array(
+            "sender_id" => $user->id,
+            "receiver_id" => $seller->id,
+            "message" => $req->message,
+            "created_at" =>  date("Y-m-d H:i:s", $req->created_at)
+        ));
+        if ($was_saved) {
+            msg_set('Data saved');
+            $api['success'] = true;
+            $api['data'] =  [];
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('Data not saved');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
+    function save_chat_in_db($db, $data)
+    {
+        try {
+            $db->tableName = 'chat_history';
+            $arr['users'] = json_encode([$data->sender_id, $data->receiver_id]);
+            $arr['sender_id'] = $data->sender_id;
+            $arr['message'] = $data->message;
+            $arr['created_at'] = $data->created_at;
+            $arr['jsn'] = json_encode($data);
+            $db->insertData = $arr;
+            return $db->create();
+        } catch (PDOException $th) {
+            return null;
+        }
+    }
     function chat_hist_api($req = null)
     {
         header('Content-Type: application/json');
@@ -655,6 +739,7 @@ class Product_api
             exit;
         }
     }
+
     function chat_history($db = new Dbobjects, $myid, $sellerid)
     {
         try {
@@ -671,7 +756,7 @@ class Product_api
                 return null;
             }
             return array_map(function ($h) {
-                $h['chat_obj'] = json_decode($h['jsn'],true);
+                $h['chat_obj'] = json_decode($h['jsn'], true);
                 if (isset($h['chat_obj']['created_at'])) {
                     $h['chat_obj']['created_at'] = strtotime($h['chat_obj']['created_at']);
                 }
