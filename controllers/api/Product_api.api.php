@@ -619,7 +619,7 @@ class Product_api
             'token' => 'required|string',
             'receiver_id' => 'required|integer',
             'message' => 'required|string',
-            'created_at' => 'required|integer',
+            'created_at' => 'required|datetime',
         ];
         $pass = validateData(data: arr($req), rules: $rules);
         if (!$pass) {
@@ -662,7 +662,7 @@ class Product_api
             "sender_id" => $user->id,
             "receiver_id" => $receiver->id,
             "message" => $req->message,
-            "created_at" =>  date("Y-m-d H:i:s", abs($req->created_at))
+            "created_at" =>  $req->created_at
         ));
         if ($was_saved) {
             msg_set('Data saved');
