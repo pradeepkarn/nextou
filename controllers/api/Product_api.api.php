@@ -802,21 +802,34 @@ class Product_api
             ";
             $hist = $db->show($sql);
             $returnarr = [];
+            $uniqueArr = [];
+
             foreach ($hist as $key => $h) {
                 $msgarr = null;
-                $h = json_decode($h['jsn'],true);
+                $h = json_decode($h['jsn'], true);
                 $msgarr['message'] = $h['message'];
-                if ($h['sender_id']==$myid) {
+
+                if ($h['sender_id'] == $myid) {
                     $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
-                }else{
+                } else {
                     $msgarr['contact'] = (new Users_api)->get_user_by_id($h['sender_id']);
                 }
+
                 if (isset($h['created_at'])) {
                     $msgarr['created_at'] = strtotime($h['created_at']);
                 }
+
                 $returnarr[] = $msgarr;
             }
-            return array_unique($returnarr);
+
+            // Iterate over the array to check for uniqueness
+            foreach ($returnarr as $arr) {
+                if (!in_array($arr, $uniqueArr, true)) {
+                    $uniqueArr[] = $arr;
+                }
+            }
+
+            return $uniqueArr;
         } catch (\PDOException $th) {
             return null;
         }
