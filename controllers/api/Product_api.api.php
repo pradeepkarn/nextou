@@ -805,7 +805,7 @@ class Product_api
             //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
             //  ORDER BY chat_history.created_at;";
 
-            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
+    $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id,
     MAX(u.first_name) as first_name,
     MAX(u.last_name) as last_name,
     MAX(ch.created_at) as last_created_at,
