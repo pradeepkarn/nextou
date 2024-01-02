@@ -617,7 +617,7 @@ class Product_api
         $req = json_decode(file_get_contents('php://input'));
         $rules = [
             'token' => 'required|string',
-            'seller_id' => 'required|integer',
+            'receiver_id' => 'required|integer',
             'message' => 'required|string',
             'created_at' => 'required|integer',
         ];
@@ -631,8 +631,8 @@ class Product_api
         }
         $userCtrl = new Users_api;
         $user = $userCtrl->get_user_by_token($req->token);
-        $seller = $userCtrl->get_user_by_id($req->seller_id);
-        if (!$seller) {
+        $receiver = $userCtrl->get_user_by_id($req->receiver_id);
+        if (!$receiver) {
             msg_set('Seller not found');
             $api['success'] = false;
             $api['data'] =  null;
@@ -648,7 +648,7 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-        if ($user['id'] == $seller['id']) {
+        if ($user['id'] == $receiver['id']) {
             msg_set('You can not chat to yourself');
             $api['success'] = false;
             $api['data'] =  null;
@@ -657,10 +657,10 @@ class Product_api
             exit;
         }
         $user = obj($user);
-        $seller = obj($seller);
+        $receiver = obj($receiver);
         $was_saved = $this->save_chat_in_db($this->db, (object)array(
             "sender_id" => $user->id,
-            "receiver_id" => $seller->id,
+            "receiver_id" => $receiver->id,
             "message" => $req->message,
             "created_at" =>  date("Y-m-d H:i:s", $req->created_at)
         ));
