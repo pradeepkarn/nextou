@@ -803,8 +803,9 @@ class Product_api
             $hist = $db->show($sql);
             $returnarr = [];
             foreach ($hist as $key => $h) {
+                $msgarr = null;
                 $h = json_decode($h['jsn'],true);
-                $msgarr['contact'] = $h['message'];
+                $msgarr['message'] = $h['message'];
                 if ($h['sender_id']==$myid) {
                     $msgarr['contact'] = (new Users_api)->get_user_by_id($h['receiver_id']);
                 }else{
