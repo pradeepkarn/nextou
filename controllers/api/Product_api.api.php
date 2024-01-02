@@ -658,7 +658,7 @@ class Product_api
         }
         $user = obj($user);
         $seller = obj($seller);
-        $was_saved = $this->save_chat_in_db($this->db, array(
+        $was_saved = $this->save_chat_in_db($this->db, (object)array(
             "sender_id" => $user->id,
             "receiver_id" => $seller->id,
             "message" => $req->message,
