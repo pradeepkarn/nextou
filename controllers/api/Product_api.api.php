@@ -836,9 +836,9 @@ class Product_api
             $sql = "SELECT *
             FROM chat_history
             WHERE (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
-               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$sellerid') OR
+               AND JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$sellerid') OR
                (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$sellerid'
-               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
+               AND JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
             ORDER BY created_at;
             ";
             $hist = $db->show($sql);
