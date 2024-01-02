@@ -739,7 +739,64 @@ class Product_api
             exit;
         }
     }
+    function chat_user_list_api($req = null)
+    {
+        header('Content-Type: application/json');
+        $req = json_decode(file_get_contents('php://input'));
+        $rules = [
+            'token' => 'required|string'
+        ];
+        $pass = validateData(data: arr($req), rules: $rules);
+        if (!$pass) {
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $userCtrl = new Users_api;
+        $user = $userCtrl->get_user_by_token($req->token);
+        if (!$user) {
+            msg_set('Invalid token');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $user = obj($user);
+        $chat = $this->chat_user_list($this->db, $myid = $user->id);
+        if ($chat) {
+            msg_set('Chat history found');
+            $api['success'] = true;
+            $api['data'] =  $chat;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('No Chat history found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
 
+    function chat_user_list($db = new Dbobjects, $myid)
+    {
+        try {
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id') as receiver_id, pk_user.image, pk_user.username
+            FROM chat_history JOIN pk_user on pk_user.id = receiver_id
+            WHERE (JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.sender_id')) = '$myid'
+               OR JSON_UNQUOTE(JSON_EXTRACT(jsn, '$.receiver_id')) = '$myid')
+            ORDER BY created_at;";
+            return $db->show($sql);
+        } catch (\PDOException $th) {
+            return null;
+        }
+        return null;
+    }
     function chat_history($db = new Dbobjects, $myid, $sellerid)
     {
         try {

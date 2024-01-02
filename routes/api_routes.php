@@ -22,4 +22,5 @@ $api_routes = [
     // chats
     '/api/v1/chat/history' => 'Product_api@chat_hist_api@name.chatHistoryApi',    
     '/api/v1/chat/save' => 'Product_api@chat_save_api@name.chatSaveApi',    
+    '/api/v1/chat/user-list' => 'Product_api@chat_user_list_api@name.chatUserListApi',    
 ];
