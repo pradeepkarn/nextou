@@ -673,6 +673,7 @@ class Product_api
             return array_map(function ($h) {
                 $h['jsn'] = json_decode($h['jsn']);
                 unset($h['jsn']);
+                unset($h['message']);
             }, $hist);
         } catch (\PDOException $th) {
             return null;
