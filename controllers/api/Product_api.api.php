@@ -819,8 +819,8 @@ class Product_api
             $hist = $db->show($sql);
             return array_map(function ($h) {
                 $h['image'] = dp_or_null($h['image']);
-                if (isset($h['created_at'])) {
-                    $h['created_at'] = strtotime($h['created_at']);
+                if (isset($h['last_created_at'])) {
+                    $h['last_created_at'] = strtotime($h['last_created_at']);
                 }
                 return $h;
             }, $hist);
