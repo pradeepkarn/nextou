@@ -820,7 +820,7 @@ JOIN pk_user u ON
     END
 WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
     OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
-GROUP BY receiver_id
+-- GROUP BY receiver_id
 ORDER BY ch.id DESC;
 ";
             $hist = $db->show($sql);
