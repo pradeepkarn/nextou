@@ -802,7 +802,11 @@ class Product_api
      WHERE (JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.sender_id')) = '$myid'
         OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
      ORDER BY chat_history.created_at;";
-            return $db->show($sql);
+            $hist = $db->show($sql);
+            return array_map(function ($h) {
+                $h['image'] = dp_or_null($h['image']);
+                return $h;
+            }, $hist);
         } catch (\PDOException $th) {
             return null;
         }
