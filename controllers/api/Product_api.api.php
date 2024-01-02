@@ -805,7 +805,8 @@ class Product_api
             //     OR JSON_UNQUOTE(JSON_EXTRACT(chat_history.jsn, '$.receiver_id')) = '$myid')
             //  ORDER BY chat_history.created_at;";
 
-            $sql = "SELECT 
+            $sql = "SELECT JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) as receiver_id, 
+            JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) as sender_id
     MAX(u.first_name) as first_name,
     MAX(u.last_name) as last_name,
     MAX(ch.message) as last_message,
@@ -820,7 +821,7 @@ JOIN pk_user u ON
     END
 WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
     OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
--- GROUP BY receiver_id
+GROUP BY receiver_id
 ORDER BY ch.id DESC;
 ";
             $hist = $db->show($sql);
