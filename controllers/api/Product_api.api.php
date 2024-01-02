@@ -618,7 +618,7 @@ class Product_api
         $rules = [
             'token' => 'required|string',
             'seller_id' => 'required|integer',
-            'message' => 'required|integer',
+            'message' => 'required|string',
             'created_at' => 'required|integer',
         ];
         $pass = validateData(data: arr($req), rules: $rules);
