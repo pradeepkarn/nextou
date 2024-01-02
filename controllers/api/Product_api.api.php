@@ -812,12 +812,17 @@ class Product_api
     MAX(ch.id) as chat_id,
     MAX(ch.created_at) as last_created_at,
     MAX(u.image) as image
-    FROM chat_history ch
-    JOIN pk_user u ON u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id'))
-    WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
-        OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
-    GROUP BY receiver_id
-    ORDER BY ch.id DESC;";
+FROM chat_history ch
+JOIN pk_user u ON
+    CASE
+        WHEN JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid' THEN u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id'))
+        ELSE u.id = JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id'))
+    END
+WHERE (JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.sender_id')) = '$myid'
+    OR JSON_UNQUOTE(JSON_EXTRACT(ch.jsn, '$.receiver_id')) = '$myid')
+GROUP BY receiver_id
+ORDER BY ch.id DESC;
+";
             $hist = $db->show($sql);
             return array_map(function ($h) {
                 $h['image'] = dp_or_null($h['image']);
