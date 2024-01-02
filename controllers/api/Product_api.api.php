@@ -810,9 +810,9 @@ class Product_api
                 $msgarr['message'] = $h['message'];
             
                 if ($h['sender_id'] == $myid) {
-                    $cont = obj((new Users_api)->get_user_by_id($h['receiver_id']));
+                    $cont = (new Users_api)->get_user_by_id($h['receiver_id']);
                 } else {
-                    $cont = obj((new Users_api)->get_user_by_id($h['sender_id']));
+                    $cont = (new Users_api)->get_user_by_id($h['sender_id']);
                 }
                 $msgarr['receiver_id'] = $cont['id'];
                 $msgarr['first_name'] = $cont['first_name'];
