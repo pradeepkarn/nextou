@@ -774,7 +774,7 @@ class Product_api
             echo json_encode($api);
             exit;
         } else {
-            msg_set('No Chat history found');
+            msg_set('No user history found');
             $api['success'] = false;
             $api['data'] =  null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
