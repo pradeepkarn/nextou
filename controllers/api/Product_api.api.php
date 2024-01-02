@@ -672,6 +672,9 @@ class Product_api
             }
             return array_map(function ($h) {
                 $h['chat_obj'] = json_decode($h['jsn']);
+                if (isset($h['chat_obj']['created_at'])) {
+                    $h['chat_obj']['created_at'] = strtotime($h['chat_obj']['created_at']);
+                }
                 unset($h['jsn']);
                 unset($h['users']);
                 unset($h['message']);
