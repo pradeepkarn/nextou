@@ -54,10 +54,7 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-        $user_id = null;
-        if ($user) {
-            $user_id = $user['id'];
-        }
+        $user_id = $user['id'];
         $products = $this->get_my_products($user_id);
         if ($products) {
             msg_set('Products fetched successfully');
@@ -494,7 +491,7 @@ class Product_api
         if ($product_array) {
             foreach ($product_array as $key => $p) {
                 $p = obj($p);
-                $products[] = $this->format_product($p);
+                $products[] = $this->format_product($p, $created_by);
             }
         }
         return  $products;
