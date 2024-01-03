@@ -46,6 +46,14 @@ class Product_api
         $token = isset($headers['user_token']) ? $headers['user_token'] : null;
         $userapi = new Users_api;
         $user = $userapi->get_user_by_token($token);
+        if (!$user) {
+            msg_set('Products fetched successfully');
+            $api['success'] = true;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
         $user_id = null;
         if ($user) {
             $user_id = $user['id'];
