@@ -541,7 +541,7 @@ class Product_api
     }
     function format_product(object $p, $user_id = null)
     {
-        $seller = $this->db->showOne("select id,first_name,last_name,address from pk_user where pk_user.id = '$p->created_by'");
+        $seller = $this->db->showOne("select id,first_name,last_name,address,isd_code,mobile from pk_user where pk_user.id = '$p->created_by'");
         $imgs = json_decode($p->imgs ?? '[]');
         $images = array_map(function ($img) {
             return img_or_null($img);
@@ -808,12 +808,12 @@ class Product_api
             $hist = $db->show($sql);
             $returnarr = [];
             $uniqueContacts = [];
-            
+
             foreach ($hist as $key => $h) {
                 $msgarr = null;
                 $h = json_decode($h['jsn'], true);
                 $msgarr['message'] = $h['message'];
-            
+
                 if ($h['sender_id'] == $myid) {
                     $cont = (new Users_api)->get_user_by_id($h['receiver_id']);
                 } else {
@@ -828,22 +828,21 @@ class Product_api
                 }
                 $returnarr[] = $msgarr;
             }
-            
+
             // Iterate over the array and check for uniqueness based on the "contact" information
             foreach ($returnarr as $arr) {
                 $contactId = $arr['receiver_id'];
-                
+
                 // Check if the contact ID is not already present in the $uniqueContacts array
                 if (!isset($uniqueContacts[$contactId])) {
                     $uniqueContacts[$contactId] = $arr;
                 }
             }
-            
+
             // Reset array keys to maintain a sequential array
             $uniqueArr = array_values($uniqueContacts);
-            
+
             return $uniqueArr;
-            
         } catch (\PDOException $th) {
             return null;
         }
