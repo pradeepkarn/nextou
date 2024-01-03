@@ -47,8 +47,8 @@ class Product_api
         $userapi = new Users_api;
         $user = $userapi->get_user_by_token($token);
         if (!$user) {
-            msg_set('Products fetched successfully');
-            $api['success'] = true;
+            msg_set('Invalid token');
+            $api['success'] = false;
             $api['data'] = null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
