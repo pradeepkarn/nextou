@@ -40,7 +40,7 @@ class Product_api
     }
     function search_listing($req = null)
     {
-        $req = isset($_GET['keyword'])?$_GET['keyword']:null;
+        $req = isset($_GET['keyword'])?$_GET:null;
         $req = obj($req);
         header('Content-Type: application/json');
         $headers = $this->headers;
@@ -52,7 +52,7 @@ class Product_api
             $user_id = $user['id'];
         }
         if (!isset($req->keyword)) {
-            msg_set('Keyword is required'.$_GET['keyword']);
+            msg_set('Keyword is required');
             $api['success'] = false;
             $api['data'] = null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
