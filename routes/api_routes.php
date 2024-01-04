@@ -15,6 +15,7 @@ $api_routes = [
     "/api/v1/product/create" =>'Product_api@create@name.productCreateApi',
     "/api/v1/product/update" =>'Product_api@update@name.productUpdateApi',
     "/api/v1/product/create-review" =>'Review_api@create@name.reviewCreateApi',
+    "/api/v1/product/review-list/{pid}" =>'Review_api@list_by_product_id@name.reviewListByPidApi',
     "/api/v1/product/mark-fav-unfav" =>'Product_api@mark_as_favunfav@name.favUnfavApi',
     "/api/v1/product/list-my-products" =>'Product_api@list_my_products@name.listMyProdsApi',
     "/api/v1/product/search" =>'Product_api@search_listing@name.searchProdsApi',

@@ -90,4 +90,66 @@ class Review_api
             exit;
         }
     }
+    function list_by_product_id($req=null) {
+        header('Content-Type: application/json');
+        // $method = $_SERVER['REQUEST_METHOD'];
+        // if (strtoupper($method)!=='POST') {
+        //     msg_set("Only post method is allowed");
+        //     $api['success'] = false;
+        //     $api['data'] = null;
+        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+        //     echo json_encode($api);
+        //     exit;
+        // }
+        $req = obj($req);
+        // $data  = json_decode(file_get_contents("php://input"), true);
+        // $rules = [
+        //     // 'token' => 'required|string',
+        //     'product_id' => 'required|numeric'
+        // ];
+        // $pass = validateData(data: $data, rules: $rules);
+        // if (!$pass) {
+        //     $api['success'] = false;
+        //     $api['data'] = null;
+        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+        //     echo json_encode($api);
+        //     exit;
+        // }
+        // $req = obj($data);
+        // $user = (new Users_api)->get_user_by_token($req->token);
+        // if (!$user) {
+        //     msg_set("Invalid token");
+        //     $api['success'] = false;
+        //     $api['data'] = null;
+        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+        //     echo json_encode($api);
+        //     exit;
+        // }
+        if (!isset($req->pid)) {
+            msg_set("Please provide product id");
+            $api['success'] = false;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $this->db->tableName = 'review';
+        $arr['item_id'] = $req->pid;
+        $review = $this->db->filter($arr);
+        if (!$review) {
+            msg_set("Review found");
+            $api['success'] = true;
+            $api['data'] = $review;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }else{
+            msg_set("Review not found");
+            $api['success'] = true;
+            $api['data'] = $review;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
 }
