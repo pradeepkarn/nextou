@@ -38,6 +38,43 @@ class Product_api
             exit;
         }
     }
+    function search_listing($req = null)
+    {
+        $req = obj($req);
+        header('Content-Type: application/json');
+        $headers = $this->headers;
+        $token = isset($headers['user_token']) ? $headers['user_token'] : null;
+        $userapi = new Users_api;
+        $user = $userapi->get_user_by_token($token);
+        $user_id = null;
+        if ($user) {
+            $user_id = $user['id'];
+        }
+        if (!isset($req->search)) {
+            msg_set('Search parameter is required');
+            $api['success'] = false;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $products = $this->search_products($req->search, $liked_by = $user_id);
+        if ($products) {
+            msg_set('Products fetched successfully');
+            $api['success'] = true;
+            $api['data'] = $products;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set('Product not found');
+            $api['success'] = false;
+            $api['data'] =  null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+    }
     function list_my_products($req = null)
     {
         $req = obj($req);
@@ -468,6 +505,23 @@ class Product_api
         $arr['is_active'] = 1;
         $arr['content_group'] = 'product';
         $product_array = $this->db->filter($arr);
+        $products = null;
+        if ($product_array) {
+            foreach ($product_array as $key => $p) {
+                $p = obj($p);
+                $products[] = $this->format_product($p, $liked_by);
+            }
+        }
+        return  $products;
+    }
+    function search_products($keyword, $liked_by = null)
+    {
+        $this->db->tableName = 'content';
+        $arr['is_active'] = 1;
+        $arr['content_group'] = 'product';
+        $sarr['title'] = $keyword;
+        $sarr['content'] = $keyword;
+        $product_array = $this->db->search(assoc_arr: $sarr, whr_arr: $arr);
         $products = null;
         if ($product_array) {
             foreach ($product_array as $key => $p) {
