@@ -10,7 +10,7 @@ class Review_api
     {
         header('Content-Type: application/json');
         $method = $_SERVER['REQUEST_METHOD'];
-        if (strtoupper($method)!=='POST') {
+        if (strtoupper($method) !== 'POST') {
             msg_set("Only post method is allowed");
             $api['success'] = false;
             $api['data'] = null;
@@ -55,6 +55,7 @@ class Review_api
         $user = obj($user);
         $this->db->tableName = 'review';
         $arr['item_id'] = $req->product_id;
+        $arr['name'] = "{$user->first_name} {$user->last_name}";
         $arr['email'] = $user->email;
         $already = $this->db->findOne($arr);
         $arr['message'] = $req->message;
@@ -90,7 +91,8 @@ class Review_api
             exit;
         }
     }
-    function list_by_product_id($req=null) {
+    function list_by_product_id($req = null)
+    {
         header('Content-Type: application/json');
         // $method = $_SERVER['REQUEST_METHOD'];
         // if (strtoupper($method)!=='POST') {
@@ -133,9 +135,8 @@ class Review_api
             echo json_encode($api);
             exit;
         }
-        $this->db->tableName = 'review';
-        $arr['item_id'] = $req->pid;
-        $review = $this->db->filter($arr);
+        $sql = "select id,rating,name,email,message from review where item_id = '$req->pid' and item_group = 'product'";
+        $review = $this->db->show($sql);
         if (!$review) {
             msg_set("Review found");
             $api['success'] = true;
@@ -143,7 +144,7 @@ class Review_api
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
             exit;
-        }else{
+        } else {
             msg_set("Review not found");
             $api['success'] = true;
             $api['data'] = $review;
