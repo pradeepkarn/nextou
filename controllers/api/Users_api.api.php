@@ -249,25 +249,25 @@ class Users_api
     function login_via_token($req = null)
     {
         header('Content-Type: application/json');
-        $ok = true;
+        // $ok = true;
         $req = obj($req);
         $data  = json_decode(file_get_contents('php://input'));
-        if (isset($req->ug)) {
-            if (!in_array($req->ug, USER_GROUP_LIST)) {
-                $ok = false;
-                msg_set("Invalid account group");
-            }
-        } else {
-            $ok = false;
-            msg_set("No user group provided");
-        }
-        if (!$ok) {
-            $api['success'] = false;
-            $api['data'] = null;
-            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-            echo json_encode($api);
-            exit;
-        }
+        // if (isset($req->ug)) {
+        //     if (!in_array($req->ug, USER_GROUP_LIST)) {
+        //         $ok = false;
+        //         msg_set("Invalid account group");
+        //     }
+        // } else {
+        //     $ok = false;
+        //     msg_set("No user group provided");
+        // }
+        // if (!$ok) {
+        //     $api['success'] = false;
+        //     $api['data'] = null;
+        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+        //     echo json_encode($api);
+        //     exit;
+        // }
         $rules = [
             'token' => 'required|string'
         ];
