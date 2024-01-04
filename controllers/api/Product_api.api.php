@@ -40,7 +40,7 @@ class Product_api
     }
     function search_listing($req = null)
     {
-        $req = obj($_GET);
+        $req = obj($_GET??[]);
         header('Content-Type: application/json');
         $headers = $this->headers;
         $token = isset($headers['user_token']) ? $headers['user_token'] : null;
