@@ -55,9 +55,9 @@ class Review_api
         $user = obj($user);
         $this->db->tableName = 'review';
         $arr['item_id'] = $req->product_id;
-        $arr['name'] = "{$user->first_name} {$user->last_name}";
         $arr['email'] = $user->email;
         $already = $this->db->findOne($arr);
+        $arr['name'] = "{$user->first_name} {$user->last_name}";
         $arr['message'] = $req->message;
         $arr['status'] = 1; //1: published 0: pending
         $arr['item_id'] = $req->product_id; //1: published 0: pending
