@@ -615,7 +615,7 @@ class Product_api
             'banner' => img_or_null($p->banner),
             'images' => $images,
             'seller' => $seller,
-            'review' => $review,
+            'reviews' => $review,
         );
     }
     function is_fav_content($db, $user_id, $content_id)
