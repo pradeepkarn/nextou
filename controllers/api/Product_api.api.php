@@ -52,7 +52,7 @@ class Product_api
             $user_id = $user['id'];
         }
         if (!isset($req->keyword)) {
-            msg_set('Keyword is required');
+            msg_set('Keyword is required'.$_GET['keyword']);
             $api['success'] = false;
             $api['data'] = null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
