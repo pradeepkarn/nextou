@@ -63,9 +63,11 @@ class Review_api
         $arr['item_id'] = $req->product_id; //1: published 0: pending
         $arr['item_group'] = 'product';
         $arr['rating'] = $req->point;
-        $this->db->insertData = $arr;
+        $datetime = date("Y-m-d H:i:s");
+        $arr['updated_at'] = $datetime;
         try {
             if ($already) {
+                $this->db->insertData = $arr;
                 $this->db->update();
                 msg_set('Review updated successfully');
                 $api['success'] = true;
@@ -74,6 +76,8 @@ class Review_api
                 echo json_encode($api);
                 exit;
             } else {
+                $arr['created_at'] = $datetime;
+                $this->db->insertData = $arr;
                 $this->db->create();
                 msg_set('Review created successfully');
                 $api['success'] = true;
@@ -94,39 +98,7 @@ class Review_api
     function list_by_product_id($req = null)
     {
         header('Content-Type: application/json');
-        // $method = $_SERVER['REQUEST_METHOD'];
-        // if (strtoupper($method)!=='POST') {
-        //     msg_set("Only post method is allowed");
-        //     $api['success'] = false;
-        //     $api['data'] = null;
-        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-        //     echo json_encode($api);
-        //     exit;
-        // }
         $req = obj($req);
-        // $data  = json_decode(file_get_contents("php://input"), true);
-        // $rules = [
-        //     // 'token' => 'required|string',
-        //     'product_id' => 'required|numeric'
-        // ];
-        // $pass = validateData(data: $data, rules: $rules);
-        // if (!$pass) {
-        //     $api['success'] = false;
-        //     $api['data'] = null;
-        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-        //     echo json_encode($api);
-        //     exit;
-        // }
-        // $req = obj($data);
-        // $user = (new Users_api)->get_user_by_token($req->token);
-        // if (!$user) {
-        //     msg_set("Invalid token");
-        //     $api['success'] = false;
-        //     $api['data'] = null;
-        //     $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-        //     echo json_encode($api);
-        //     exit;
-        // }
         if (!isset($req->pid)) {
             msg_set("Please provide product id");
             $api['success'] = false;

@@ -597,6 +597,7 @@ class Product_api
     function format_product(object $p, $user_id = null)
     {
         $seller = $this->db->showOne("select id,first_name,last_name,address,isd_code,mobile from pk_user where pk_user.id = '$p->created_by'");
+        $review = $this->db->show("select id,rating,name,email,message from review where item_id = '$p->id' and item_group = 'product' order by updated_at desc limit 5");
         $imgs = json_decode($p->imgs ?? '[]');
         $images = array_map(function ($img) {
             return img_or_null($img);
@@ -613,7 +614,8 @@ class Product_api
             'is_fav' => $is_fav,
             'banner' => img_or_null($p->banner),
             'images' => $images,
-            'seller' => $seller
+            'seller' => $seller,
+            'review' => $review,
         );
     }
     function is_fav_content($db, $user_id, $content_id)
