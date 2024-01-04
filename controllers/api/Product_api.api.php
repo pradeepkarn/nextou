@@ -40,7 +40,7 @@ class Product_api
     }
     function search_listing($req = null)
     {
-        $req = isset($_GET['search'])?$_GET['search']:null;
+        $req = isset($_GET['keyword'])?$_GET['keyword']:null;
         $req = obj($req);
         header('Content-Type: application/json');
         $headers = $this->headers;
@@ -51,7 +51,7 @@ class Product_api
         if ($user) {
             $user_id = $user['id'];
         }
-        if (!isset($req->search)) {
+        if (!isset($req->keyword)) {
             msg_set('Search parameter is required');
             $api['success'] = false;
             $api['data'] = null;
@@ -59,7 +59,7 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-        $products = $this->search_products($req->search, $liked_by = $user_id);
+        $products = $this->search_products($req->keyword, $liked_by = $user_id);
         if ($products) {
             msg_set('Products fetched successfully');
             $api['success'] = true;
