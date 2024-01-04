@@ -137,7 +137,7 @@ class Review_api
         }
         $sql = "select id,rating,name,email,message from review where item_id = '$req->pid' and item_group = 'product'";
         $review = $this->db->show($sql);
-        if (!$review) {
+        if ($review) {
             msg_set("Review found");
             $api['success'] = true;
             $api['data'] = $review;
@@ -146,8 +146,8 @@ class Review_api
             exit;
         } else {
             msg_set("Review not found");
-            $api['success'] = true;
-            $api['data'] = $review;
+            $api['success'] = false;
+            $api['data'] = null;
             $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
             echo json_encode($api);
             exit;
