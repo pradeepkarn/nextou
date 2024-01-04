@@ -70,6 +70,9 @@ class Review_api
                 $this->db->insertData = $arr;
                 $this->db->update();
                 msg_set('Review updated successfully');
+                if ($user->firebase_device_token!='') {
+                    Push_ctrl::push($user->firebase_device_token,array('title'=>'Review updated','body'=>"{$arr['name']} updated review with {$arr['rating']} star point for your product id: {$req->product_id}"));
+                }
                 $api['success'] = true;
                 $api['data'] = [];
                 $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
@@ -79,6 +82,9 @@ class Review_api
                 $arr['created_at'] = $datetime;
                 $this->db->insertData = $arr;
                 $this->db->create();
+                if ($user->firebase_device_token!='') {
+                    Push_ctrl::push($user->firebase_device_token,array('title'=>'Review created','body'=>"{$arr['name']} added review {$arr['rating']} star point for your product id: {$req->product_id}"));
+                }
                 msg_set('Review created successfully');
                 $api['success'] = true;
                 $api['data'] = [];

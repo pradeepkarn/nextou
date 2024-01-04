@@ -40,7 +40,7 @@ class Product_api
     }
     function search_listing($req = null)
     {
-        $req = isset($_GET['keyword'])?$_GET:null;
+        $req = isset($_GET['keyword']) ? $_GET : null;
         $req = obj($req);
         header('Content-Type: application/json');
         $headers = $this->headers;
@@ -199,8 +199,7 @@ class Product_api
             echo json_encode($api);
             exit;
         }
-
-
+        $u = obj($user);
         $created_at = date('Y-m-d H:i:s');
 
         try {
@@ -209,12 +208,18 @@ class Product_api
             $is_fav = $db->findOne(['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id']]);
             if ($is_fav) {
                 $db->delete();
+                if ($u->firebase_device_token != '') {
+                    Push_ctrl::push($u->firebase_device_token, array('title' => 'Favourite', 'body' => "Removed from favourite list"));
+                }
                 $api['success'] = true;
                 $api['data'] =  false;
                 msg_set('Favourite removed');
             } else {
                 $db->insertData = ['content_id' => $req->id, 'content_group' => 'fav', 'user_id' => $user['id'], 'created_at' => $created_at];
                 $db->create();
+                if ($u->firebase_device_token != '') {
+                    Push_ctrl::push($u->firebase_device_token, array('title' => 'Favourite', 'body' => "Marked as favourite"));
+                }
                 $api['success'] = true;
                 $api['data'] =  true;
                 msg_set('Favourite saved');

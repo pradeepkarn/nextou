@@ -492,6 +492,7 @@ class Users_api
                     'isd_code' => $u->isd_code,
                     'mobile' => $u->mobile,
                     'food_category' => $u->food_category,
+                    'firebase_device_token' => $u->firebase_device_token,
                     'token' => $u->app_login_token,
                 );
             }
@@ -515,6 +516,7 @@ class Users_api
                     'isd_code' => $u->isd_code,
                     'mobile' => $u->mobile,
                     'food_category' => $u->food_category,
+                    'firebase_device_token' => $u->firebase_device_token,
                     'token' => $u->app_login_token,
                 );
             }
