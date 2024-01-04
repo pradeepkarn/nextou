@@ -352,6 +352,9 @@ class Product_api
 
             $postid = (new Model('content'))->store($arr);
             if (intval($postid)) {
+                if ($user->firebase_device_token != '') {
+                    Push_ctrl::push($user->firebase_device_token, array('title' => 'Product created', 'body' => "Congratulations product {$request->title}, (id : {$postid}) created!"));
+                }
                 _note(message: "Product: {$postid} created", created_by: $user->id, cg: 1, via: 2);
                 $ext = pathinfo($request->banner['name'], PATHINFO_EXTENSION);
                 $imgname = str_replace(" ", "_", getUrlSafeString($request->title)) . uniqid("_") . "." . $ext;
@@ -367,6 +370,9 @@ class Product_api
                 echo json_encode($api);
                 exit;
             } else {
+                if ($user->firebase_device_token != '') {
+                    Push_ctrl::push($user->firebase_device_token, array('title' => 'Product not created', 'body' => "Product {$request->title} not created."));
+                }
                 msg_set('Product not created');
                 $api['success'] = false;
                 $api['data'] =  null;
@@ -483,6 +489,10 @@ class Product_api
             try {
                 (new Model('content'))->update($request->id, $arr);
                 _note(message: "Product: {$request->id} updated", created_by: $user['id'], cg: 1, via: 2);
+                $u = obj($user);
+                if ($u->firebase_device_token != '') {
+                    Push_ctrl::push($u->firebase_device_token, array('title' => 'Product updated', 'body' => "Product {$request->title}, (id : {$request->id}) updated!"));
+                }
                 msg_set('Product updated');
                 $api['success'] = true;
                 $api['data'] =  [];
