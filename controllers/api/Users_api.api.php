@@ -284,15 +284,7 @@ class Users_api
         $user = $this->get_user_by_token($data->token);
 
         if ($user) {
-            if ($user['user_group'] != $req->ug) {
-                $ok = false;
-                msg_set("Invalid login portal");
-                $api['success'] = false;
-                $api['data'] = null;
-                $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
-                echo json_encode($api);
-                exit;
-            }
+            // s
             msg_set("User found");
             $api['success'] = true;
             $api['data'] = $user;
