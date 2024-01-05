@@ -1440,24 +1440,44 @@ function modifyJsonArray($jsonString, $valueToDelete = null, $valueToInsert = nu
   return json_encode($array);
 }
 
+// function showStars($rating)
+// {
+//   $maxRating = 5;
+//   $roundedRating = round($rating * 2) / 2; // Round to nearest 0.5
+
+//   $starsHtml = '';
+//   for ($i = 0; $i < $maxRating; $i++) {
+//     if ($i < $roundedRating) {
+//       $starsHtml .= '★'; // Full star
+//     } else if ($i == floor($roundedRating) && $roundedRating % 1 !== 0) {
+//       $starsHtml .= '½'; // Half star
+//     } else {
+//       $starsHtml .= '☆'; // Empty star
+//     }
+//   }
+
+//   return $starsHtml;
+// }
 function showStars($rating)
 {
   $maxRating = 5;
   $roundedRating = round($rating * 2) / 2; // Round to nearest 0.5
 
-  $starsHtml = '';
+  $starsHtml = '<div class="stars-container">';
   for ($i = 0; $i < $maxRating; $i++) {
     if ($i < $roundedRating) {
-      $starsHtml .= '★'; // Full star
+      $starsHtml .= '<span style="color: gold;">★</span>'; // Full star with gold color
     } else if ($i == floor($roundedRating) && $roundedRating % 1 !== 0) {
-      $starsHtml .= '½'; // Half star
+      $starsHtml .= '<span style="color: gold;">½</span>'; // Half star with gold color
     } else {
-      $starsHtml .= '☆'; // Empty star
+      $starsHtml .= '<span style="color: lightgrey;">☆</span>'; // Empty star with light grey color
     }
   }
+  $starsHtml .= '</div>';
 
   return $starsHtml;
 }
+
 function changeToAMPM($timeString)
 {
   $formattedTime = date("g:i A", strtotime($timeString));
