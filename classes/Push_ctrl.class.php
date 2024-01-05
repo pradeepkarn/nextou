@@ -9,7 +9,7 @@ class Push_ctrl
   {
     $client = new Client();
     $headers = [
-      'Authorization' => 'key=AAAAFothlcw:APA91bFfvz26AnD0h-KMomtUZ2Wzy-JqI0Drlpx3AHTRLmEyq--WFjHS64ZYUByiUkpd7BTDNUVp25vCYYYX1W8HfEAVlGjSTpA0LIcYai8jP61nLO_xha52mjpE-iF2xjP9xlMNvAcJ',
+      'Authorization' => FIREBASE_TOKEN,
       'Content-Type' => 'application/json'
     ];
     $bodydata = array(
