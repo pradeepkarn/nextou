@@ -13,8 +13,8 @@ function _note($db = new Dbobjects, $message = "Test", $created_by = 0, $cg = 1,
       'message' => $message,
       'user_id' => $created_by,
       'created_at' => date('Y-m-d H:i:s'),
-      'content_group' => $cg,
-      'via' => $via,
+      'content_group' => $cg, //0: other, 1: Product, 2: account
+      'via' => $via, //0: Unknown, 1: web, 2: app
       'ip' => $ip,
       'device_info' => $device,
       'device_id' => $sys_id

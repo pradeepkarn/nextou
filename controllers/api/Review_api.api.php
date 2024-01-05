@@ -63,6 +63,7 @@ class Review_api
         $arr['item_id'] = $req->product_id; //1: published 0: pending
         $arr['item_group'] = 'product';
         $arr['rating'] = $req->point;
+        $arr['by_admin'] = '0';
         $datetime = date("Y-m-d H:i:s");
         $arr['updated_at'] = $datetime;
         try {

@@ -15,18 +15,20 @@ if ($pd->json_obj != "") {
 }
 ?>
 
-<form action="/<?php echo home . route('productUpdateAjax', ['id' => $pd->id]); ?>" id="update-new-product-form">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col">
-                    <h5 class="card-title">Edit Product</h5>
-                </div>
-                <div class="col text-end my-3">
-                    <a class="btn btn-dark" href="/<?php echo home . route('productList'); ?>">Back</a>
-                </div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <h5 class="card-title">Edit Product</h5>
             </div>
-            <div id="res"></div>
+            <div class="col text-end my-3">
+                <a class="btn btn-dark" href="/<?php echo home . route('productList'); ?>">Back</a>
+            </div>
+        </div>
+        <div id="res"></div>
+        <form action="/<?php echo home . route('productUpdateAjax', ['id' => $pd->id]); ?>" id="update-new-product-form">
+
             <div class="row">
                 <div class="col-md-8">
                     <h4>Title</h4>
@@ -54,7 +56,7 @@ if ($pd->json_obj != "") {
                     <h4>Banner</h4>
                     <input accept="image/*" id="image-input" type="file" name="banner" class="form-control my-3">
                     <img style="width:100%; max-height:300px; object-fit:contain;" id="banner" src="/<?php echo MEDIA_URL; ?>/images/pages/<?php echo $pd->banner; ?>" alt="<?php echo $pd->banner; ?>">
-                    
+
                     <div id="image-container"></div>
                     <button type="button" class="btn btn-secondary text-white mt-2" id="add-image">Images <i class="bi bi-plus"></i> </button>
                     <hr>
@@ -78,17 +80,21 @@ if ($pd->json_obj != "") {
                     </div>
 
 
-                    
+
                     <div class="d-grid">
                         <button id="update-product-btn" type="button" class="btn btn-primary my-3">Update</button>
                     </div>
                 </div>
             </div>
-
-        </div>
+        </form>
+        <hr>
+        <h3>Review Section</h3>
+        <?php
+        import("apps/admin/pages/products/reviews-module.php", ['prod' => $product_detail]);
+        ?>
     </div>
+</div>
 
-</form>
 <script>
     window.onload = () => {
 

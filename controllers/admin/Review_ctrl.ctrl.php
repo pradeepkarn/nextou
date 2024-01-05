@@ -1,81 +1,158 @@
 <?php
 class Review_ctrl
 {
-    function add_review_ajax($req = null)
+    public $db;
+    function __construct()
     {
-        $req = obj($req);
-        $data = null;
-        $data = $_POST;
-        $rules = [
-            'name_of_user' => 'required|string',
-            'content_id' => 'required|integer',
-            'review_message' => 'required|string',
-        ];
-
-        $pass = validateData(data: $data, rules: $rules);
-        if (!$pass) {
-            $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-            $data['success'] = false;
-            $data['data'] = null;
-            echo json_encode($data);
+        $this->db = (new DB_ctrl)->db;
+    }
+    function admin_create($req)
+    {
+        // header('Content-Type: application/json');
+        $method = $_SERVER['REQUEST_METHOD'];
+        if (strtoupper($method) !== 'POST') {
+            msg_set("Only post method is allowed");
+            echo msg_ssn(return: true, lnbrk: ", ");
             exit;
         }
-        $data = null;
-        if (is_superuser()) {
-            $db = new Dbobjects;
-            $db->tableName = "review";
-            $arr['name'] = $_POST['name_of_user'];
-            $arr['message'] = $_POST['review_message'];
-            $arr['rating'] = intval($_POST['star_point']);
-            $arr['email'] = generate_dummy_email('usr');
-            $arr['item_id'] = $_POST['content_id'];
-            $arr['item_group'] = $req->rg;
-            $arr['status'] = "published";
-            $db->insertData = $arr;
-            try {
-                $db->create();
-                msg_set("Review added");
-                $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-                $data['success'] = true;
-                $data['data'] = null;
-                echo json_encode($data);
+        $req = obj($req);
+        $data  = $_POST;
+        $rules = [
+            'product_id' => 'required|numeric',
+            'point' => 'required|numeric',
+            'name' => 'required|string',
+            'message' => 'required|string',
+
+        ];
+        $pass = validateData(data: $data, rules: $rules);
+        if (!$pass) {
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+        $req = obj($data);
+        // $user = (new Users_api)->get_user_by_token($req->token);
+        if (!is_admin()) {
+            msg_set("Your are not and admin, access denied");
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+        if (!(0 < $req->point && $req->point <= 5)) {
+            msg_set("The Rating point range is 1 to 5");
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+        $this->db->tableName = 'review';
+        $arr['item_id'] = $req->product_id;
+        $arr['email'] = generate_dummy_email('usr');
+        $already = $this->db->findOne($arr);
+        $arr['name'] = $req->name;
+        $arr['message'] = $req->message;
+        $arr['status'] = 1; //1: published 0: pending
+        $arr['item_id'] = $req->product_id; //1: published 0: pending
+        $arr['item_group'] = 'product';
+        $arr['rating'] = $req->point;
+        $arr['by_admin'] = 1;
+        $datetime = date("Y-m-d H:i:s");
+        $arr['updated_at'] = $datetime;
+        try {
+            if ($already) {
+                $this->db->insertData = $arr;
+                $this->db->update();
+                msg_set('Review updated successfully');
+                echo msg_ssn(return: true, lnbrk: ", ");
+                _note(message: "Review via admin: updated successfully", created_by: USER['id'], cg: 1, via: 1);
+                echo RELOAD;
                 exit;
-            } catch (PDOException $th) {
-                msg_set("Review not added");
-                $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-                $data['success'] = false;
-                $data['data'] = null;
-                echo json_encode($data);
+            } else {
+                $arr['created_at'] = $datetime;
+                $this->db->insertData = $arr;
+                $this->db->create();
+                msg_set('Review created successfully');
+                echo msg_ssn(return: true, lnbrk: ", ");
+                _note(message: "Review via admin: created successfully", created_by: USER['id'], cg: 1, via: 1);
+                echo RELOAD;
                 exit;
             }
-        } else {
-            msg_set("Not authorised user to add review");
-            $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-            $data['success'] = false;
-            $data['data'] = null;
-            echo json_encode($data);
+        } catch (PDOException $th) {
+            msg_set('Review not created');
+            echo msg_ssn(return: true, lnbrk: ", ");
             exit;
         }
     }
-    function delete_review_ajax($req=null) {
+    function reviwe_delete($req = null)
+    {
+        header('Content-Type: application/json');
+        $method = $_SERVER['REQUEST_METHOD'];
+        if (strtoupper($method) !== 'POST') {
+            msg_set("Only post method is allowed");
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
         $req = obj($req);
-        if (is_superuser()) {
-            $repl = (new Model('review'))->destroy($_POST['dm_review_id']);
-            if ($repl) {
-                msg_set("Review deleted");
-                $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-                $data['success'] = true;
-                $data['data'] = null;
-                echo json_encode($data);
+        $data  = $_POST;
+        $rules = [
+            'review_id' => 'required|numeric'
+        ];
+        $pass = validateData(data: $data, rules: $rules);
+        if (!$pass) {
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+        $req = obj($data);
+        if (!is_admin()) {
+            msg_set("Your are not and admin, access denied");
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+        $this->db->tableName = 'review';
+        $this->db->pk($req->review_id);
+        $already = $this->db->pk($req->review_id);
+        try {
+            if ($already) {
+                $this->db->delete();
+                echo msg_ssn(return: true, lnbrk: ", ");
+                _note(message: "Review: {$req->review_id} deleted permanantly", created_by: USER['id'], cg: 1, via: 1);
+                echo RELOAD;
                 exit;
-            }else{
-                msg_set("Review not added");
-                $data['msg'] = msg_ssn(return: true, lnbrk: "<br>");
-                $data['success'] = false;
-                $data['data'] = null;
-                echo json_encode($data);
+            } else {
+                msg_set('Review not found');
+                echo msg_ssn(return: true, lnbrk: ", ");
                 exit;
             }
-        };
+        } catch (PDOException $th) {
+            _note(message: "Review: {$req->review_id} not deleted database error", created_by: USER['id'], cg: 1, via: 1);
+            msg_set('Review not deleted database error');
+            echo msg_ssn(return: true, lnbrk: ", ");
+            exit;
+        }
+    }
+    function list_by_product_id($req = null)
+    {
+        $req = obj($req);
+        if (!isset($req->pid)) {
+            msg_set("Please provide product id");
+            $api['success'] = false;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
+        $sql = "select id,rating,name,email,message from review where item_id = '$req->pid' and item_group = 'product'";
+        $review = $this->db->show($sql);
+        if ($review) {
+            msg_set("Review found");
+            $api['success'] = true;
+            $api['data'] = $review;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        } else {
+            msg_set("Review not found");
+            $api['success'] = false;
+            $api['data'] = null;
+            $api['msg'] = msg_ssn(return: true, lnbrk: ", ");
+            echo json_encode($api);
+            exit;
+        }
     }
 }

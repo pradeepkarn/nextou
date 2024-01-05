@@ -61,7 +61,7 @@ $active = $context->is_active;
                                 <th scope="col">Banner</th>
                                 <th scope="col">Title</th>
                                 <th scope="col">category</th>
-                                <th scope="col">Hits</th>
+                                <th scope="col">Review Count</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Publish Date</th>
                                 <?php
@@ -80,8 +80,12 @@ $active = $context->is_active;
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($pl as $key => $pv) :
+                            <?php
+                            $db = new Dbobjects;
+                            foreach ($pl as $key => $pv) :
                                 $pv = obj($pv);
+                                $rv = $db->showOne("select COUNT(id) as cnt from review where item_id = $pv->id and item_group='product';");
+                                $rvwcnt = $rv ? $rv['cnt'] : 0;
                                 $cat = getData(table: "content", id: $pv->parent_id);
                                 $cat_title =  $cat ? $cat['title'] : "Uncategorised";
                                 if ($pv->is_active == true) {
@@ -112,7 +116,9 @@ $active = $context->is_active;
                                     </th>
                                     <td><?php echo $pv->title; ?></td>
                                     <td><?php echo $cat_title; ?></td>
-                                    <td><?php echo $pv->views; ?></td>
+                                    <td>
+                                        <p class="text-center <?php echo $rvwcnt ? 'bg-success text-white' : null; ?>"><?php echo $rvwcnt; ?></p>
+                                    </td>
                                     <td><?php echo $pv->status; ?></td>
                                     <td><?php echo $pv->created_at; ?></td>
                                     <?php
@@ -158,9 +164,6 @@ $active = $context->is_active;
                                 <li class="page-item"><a class="page-link" href="/<?php echo home . $link . "?page=$i"; ?>"><?php echo $i; ?></a></li>
                             <?php
                             } ?>
-
-
-
 
                         </ul>
                     </nav>

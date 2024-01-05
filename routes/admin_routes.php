@@ -35,6 +35,9 @@ $admin_routes = [
     '/admin/product/delete/{id}' => 'Product_ctrl@delete_trash@name.productDelete',
     '/admin/product/edit/{id}/save-by-ajax' => 'Product_ctrl@update@name.productUpdateAjax',
     '/admin/product/toggle-marked-page' => 'Product_ctrl@toggle_trending@name.productToggleMarked',
+    // review
+    "/admin/review/admin-create" =>'Review_ctrl@admin_create@name.reviewAdminCreateAdmin',
+    "/admin/review/admin-delete" =>'Review_ctrl@reviwe_delete@name.reviewAdminDeleteAdmin',
     // 
     '/admin/package/create' => 'Package_ctrl@create@name.packageCreate',
     '/admin/package/create/save-by-ajax' => 'Package_ctrl@save@name.packageStoreAjax',
@@ -91,6 +94,7 @@ $admin_routes = [
     '/admin/product-category/restore/{id}' => 'Product_category_admin_ctrl@restore@name.productCatRestore',
     '/admin/product-category/delete/{id}' => 'Product_category_admin_ctrl@delete_trash@name.productCatDelete',
     '/admin/product-category/edit/{id}/save-by-ajax' => 'Product_category_admin_ctrl@update@name.productCatUpdateAjax',
+    
     // Accounts
     '/admin/account/{ug}/create' => 'Admin_user_ctrl@create@name.userCreate',
     '/admin/account/{ug}/create/save-by-ajax' => 'Admin_user_ctrl@save@name.userStoreAjax',

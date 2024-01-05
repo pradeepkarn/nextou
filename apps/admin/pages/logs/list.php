@@ -65,7 +65,7 @@ $active = $context->is_active;
                                 <th scope="col">
                                     <input type="checkbox" id="selct_all_ids"> Select
                                 </th>
-                                <th scope="col">Log ID</th>
+                                <th scope="col">IP</th>
                                 <th scope="col">Message</th>
                                 <th scope="col">Device Info</th>
                                 <th scope="col">Device ID</th>
@@ -82,7 +82,7 @@ $active = $context->is_active;
                                     <th>
                                         <input type="checkbox" name="selected_obj_id" value="<?php echo $pv->id; ?>">
                                     </th>
-                                    <th scope="row"><?php echo $pv->id; ?></th>
+                                    <th scope="row"><?php echo $pv->ip; ?></th>
                                     <td><?php echo $pv->message; ?></td>
                                     <td><?php echo $pv->device_info; ?></td>
                                     <td><?php echo $pv->device_id ?? "NA"; ?></td>
