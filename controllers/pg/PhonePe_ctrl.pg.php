@@ -21,7 +21,7 @@ class PhonePe_ctrl
             'redirectMode' => "POST",
             'callbackUrl' => BASEURI . "/phonepe-res",
             "merchantOrderId" => uniqid('order'),
-            "mobileNumber" => 8825137323,
+            "mobileNumber" => 9801465559,
             "message" => "This is test order",
             "email" => "mail2pkarn@gmail.com",
             "shortName" => "Pradeep",
@@ -61,7 +61,7 @@ class PhonePe_ctrl
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-        print_r($response);
+        // print_r($response);
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {
