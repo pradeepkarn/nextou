@@ -1,7 +1,7 @@
 <?php
 class PhonePe_ctrl
 {
-    function req($req=null)
+    function req($req = null)
     {
         // Replace these with your actual PhonePe API credentials
         $keyIndex = 1;
@@ -14,9 +14,9 @@ class PhonePe_ctrl
             'merchantTransactionId' => uniqid('merchant'),
             "merchantUserId" => "pkarnTest",
             'amount' => 1000, // Amount in paisa (10 INR)
-            'redirectUrl' => BASEURI."/phonepe-req",
+            'redirectUrl' => BASEURI . "/phonepe-req",
             'redirectMode' => "POST",
-            'callbackUrl' => BASEURI."/phonepe-res",
+            'callbackUrl' => BASEURI . "/phonepe-res",
             "merchantOrderId" => uniqid('order'),
             "mobileNumber" => 8825137323,
             "message" => "This is test order",
@@ -55,8 +55,26 @@ class PhonePe_ctrl
                 "accept: application/json"
             ],
         ]);
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            $res = json_decode($response);
+
+            if (isset($res->success) && $res->success == '1') {
+                $paymentCode = $res->code;
+                $paymentMsg = $res->message;
+                $payUrl = $res->data->instrumentResponse->redirectInfo->url;
+
+                header('Location:' . $payUrl);
+            }
+        }
     }
-    function res($req=null) {
+    function res($req = null)
+    {
         
     }
 }
