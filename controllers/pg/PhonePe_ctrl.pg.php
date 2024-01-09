@@ -5,7 +5,7 @@ class PhonePe_ctrl
     {
         // Replace these with your actual PhonePe API credentials
         $keyIndex = 1;
-        $apiKey = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399';
+        $apiKey = 'b034a6df-e7f2-4aad-bf3e-882126b46212';
         $merchantId = 'M22SLNNE0AJ5Y';
 
         // Prepare the payment request data (you should customize this)
@@ -38,10 +38,10 @@ class PhonePe_ctrl
         $final_x_header = $sha256 . '###' . $salt_index;
         $request = json_encode(array('request' => $payloadMain));
 
-
+        $produri = "https://api.phonepe.com/apis/hermes";
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay",
+            CURLOPT_URL => $produri,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
