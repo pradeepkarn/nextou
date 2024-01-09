@@ -38,7 +38,7 @@ class PhonePe_ctrl
         $final_x_header = $sha256 . '###' . $salt_index;
         $request = json_encode(array('request' => $payloadMain));
 
-        $produri = "https://api.phonepe.com/apis/hermes";
+        $produri = "https://api.phonepe.com/v3/charge";
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => $produri,
