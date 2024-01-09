@@ -5,11 +5,11 @@ class PhonePe_ctrl
     {
         // Replace these with your actual PhonePe API credentials
         $keyIndex = 1;
-        // $apiKey = 'b034a6df-e7f2-4aad-bf3e-882126b46212';
-        // $merchantId = 'M22SLNNE0AJ5Y';
+        $apiKey = 'b034a6df-e7f2-4aad-bf3e-882126b46212';
+        $merchantId = 'M22SLNNE0AJ5Y';
 
-        $merchantId = 'PGTESTPAYUAT'; // sandbox or test merchantId
-        $apiKey = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"; //sandbox
+        // $merchantId = 'PGTESTPAYUAT'; // sandbox or test merchantId
+        // $apiKey = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399"; //sandbox
 
         // Prepare the payment request data (you should customize this)
         $paymentData = array(
