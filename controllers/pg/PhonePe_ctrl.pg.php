@@ -17,7 +17,7 @@ class PhonePe_ctrl
             'merchantTransactionId' => uniqid('merchant'),
             "merchantUserId" => "pkarnTest",
             'amount' => 1000, // Amount in paisa (10 INR)
-            'redirectUrl' => BASEURI . "/phonepe-req",
+            'redirectUrl' => BASEURI . "/phonepe-res",
             'redirectMode' => "POST",
             'callbackUrl' => BASEURI . "/phonepe-res",
             "merchantOrderId" => uniqid('order'),
@@ -78,6 +78,10 @@ class PhonePe_ctrl
     }
     function res($req = null)
     {
-        print_r(file_get_contents('php://input'));
+        if ($_POST['code'] == 'PAYMENT_SUCCESS') {
+            print_r($_POST);
+        } else {
+            print_r($_POST);
+        }
     }
 }
