@@ -6,6 +6,7 @@ include_once 'public_routes.php';
 include_once 'api_routes.php';
 include_once 'admin_routes.php';
 include_once 'admin_payment_routes.php';
+include_once 'phonepe_routes.php';
 include_once 'ajax_routes.php';
 
 
@@ -15,6 +16,7 @@ $routes = array_merge(
     $login_routes,
     $admin_routes,
     $api_routes,
+    $phonepe_routes,
     $ajax
 );
 // define('ROUTES',$routes);
