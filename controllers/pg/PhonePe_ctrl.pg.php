@@ -5,7 +5,7 @@ class PhonePe_ctrl
     {
         // Replace these with your actual PhonePe API credentials
         $keyIndex = 1;
-        $apiKey = 'b034a6df-e7f2-4aad-bf3e-882126b46212';
+        $apiKey = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399';
         $merchantId = 'M22SLNNE0AJ5Y';
 
         // Prepare the payment request data (you should customize this)
