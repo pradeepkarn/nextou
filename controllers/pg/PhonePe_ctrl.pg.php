@@ -78,5 +78,6 @@ class PhonePe_ctrl
     }
     function res($req = null)
     {
+        print_r(file_get_contents('php://input'));
     }
 }
