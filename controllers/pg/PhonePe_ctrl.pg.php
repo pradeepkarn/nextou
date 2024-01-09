@@ -61,7 +61,7 @@ class PhonePe_ctrl
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-        // print_r($response);
+        print_r($response);
         if ($err) {
             echo "cURL Error #:" . $err;
         } else {
